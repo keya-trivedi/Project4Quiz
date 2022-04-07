@@ -1,5 +1,5 @@
 public class Question {
-    private String question;
+    protected String question;
     
     Question(String question) {
         this.question = question;
