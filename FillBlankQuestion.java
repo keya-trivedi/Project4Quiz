@@ -1,9 +1,8 @@
-
 public class FillBlankQuestion extends Question{
-    String answer;
+    private String answer;
 
     public FillBlankQuestion(String question, String answer) {
-        super(question);
+        this.question = question;
         this.answer = answer.toLowerCase();
     }
 
@@ -18,5 +17,13 @@ public class FillBlankQuestion extends Question{
     public void setAnswer(String answer) {
         this.answer = answer;
     }
-    
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FillBlankQuestion that = (FillBlankQuestion) o;
+        return answer.equals(that.answer) && question.equals(that.question);
+    }
+
+
 }

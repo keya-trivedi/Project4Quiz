@@ -1,9 +1,5 @@
-public class Question {
+public abstract class Question {
     protected String question;
-    
-    Question(String question) {
-        this.question = question;
-    }
 
     public String getQuestion() {
         return question;
@@ -12,4 +8,8 @@ public class Question {
     public void setQuestion(String question) {
         this.question = question;
     }
+
+    public abstract boolean equals(Object o);
+
+
 }
