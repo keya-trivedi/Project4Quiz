@@ -1,6 +1,10 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class User {
-    private String username;
-    private String password;
+    protected String username;
+    protected String password;
 
     User(String username, String password) {
         this.username = username;
@@ -22,9 +26,31 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    public boolean equals(String username, String password) {
-        return this.username.equals(username) && this.password == password;
+
+    public boolean equals(Object o) {
+        User that = (User) o;
+        return this.username.equals(that.username) && this.password.equals((that.password));
     }
-    
+
+    public void toFile(String fileName) {
+        File f = new File(fileName);
+        String descriptor;
+        if (this instanceof Teacher) {
+            descriptor = "Teacher";
+        } else {
+            descriptor = "Student";
+        }
+
+        try {
+            FileWriter fwr = new FileWriter(f);
+            fwr.append(String.format("%s,%s,%s\n",username, password, descriptor));
+            fwr.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 }
