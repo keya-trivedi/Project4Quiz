@@ -19,7 +19,7 @@ public class ControlFlow {
     public static String SECOND_MC_CHOICE = "What is the value of the second choice: ";
     public static String THIRD_MC_CHOICE = "What is the value of the third choice: ";
     public static String FOURTH_MC_CHOICE = "What is the value of the fourth choice: ";
-    public static String ANSWER_MC_PROMPT = "What is the answer for this question";
+    public static String ANSWER_PROMPT = "What is the answer for this question";
 
 
 
@@ -47,6 +47,17 @@ public class ControlFlow {
         return num;
     }
 
+    public static FillBlankQuestion createFillBlankQuestion(Scanner scanner) {
+        System.out.println(QUESTION_PROMPT);
+        String prompt = scanner.nextLine();
+
+        System.out.println(ANSWER_PROMPT);
+        String answer = scanner.nextLine();
+        
+        FillBlankQuestion question = new FillBlankQuestion(prompt, answer);
+        return question;
+        
+    }
 
     public static MCquestion createMCquestion(Scanner scanner) {
         System.out.println(QUESTION_PROMPT);
@@ -64,7 +75,7 @@ public class ControlFlow {
         System.out.println(FOURTH_MC_CHOICE);
         String choice4 = scanner.nextLine();
 
-        int answer = readInt(scanner, ANSWER_MC_PROMPT + "\n1." + choice1 + "\n2." + choice2 + "\n3." + choice3 + "\n4." + choice4,1, 4);
+        int answer = readInt(scanner, ANSWER_PROMPT + "\n1." + choice1 + "\n2." + choice2 + "\n3." + choice3 + "\n4." + choice4,1, 4);
         MCquestion question = new MCquestion(prompt, choice1, choice2, choice3, choice4, answer);
 
         return question;
@@ -82,6 +93,8 @@ public class ControlFlow {
         while(questionType != 4) {
             if (questionType == 1) {
                 currentQuiz.addQuestion(createMCquestion(scanner));
+            } else if (questionType == 2) {
+                currentQuiz.addQuestion(createFillBlankQuestion(scanner));
             }
 
             questionType = readInt(scanner, "What type of question do you want to add?\n" + QUESTION_TYPES_WITH_EXIT, 1, 4);
@@ -251,7 +264,6 @@ public class ControlFlow {
                     case 7:
                         //FIXME
                         break;
-
 
                 }
             }
