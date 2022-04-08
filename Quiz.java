@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Quiz {
     private String quizName;
@@ -6,6 +7,7 @@ public class Quiz {
 
     public Quiz(String quizName) {
         this.quizName = quizName;
+        this.questions = new ArrayList<Question>();
     }
 
     public void addQuestion(Question question) {
@@ -27,3 +29,13 @@ public class Quiz {
         return false; //the question was not in the quiz
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Quiz quiz = (Quiz) o;
+        return Objects.equals(quizName, quiz.quizName);
+    }
+
+}
