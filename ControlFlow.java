@@ -12,6 +12,7 @@ public class ControlFlow {
     public static String LOGGED_IN_TEACHER_OPTIONS ="1.Make a quiz\n2.Edit a quiz\n3.Delete quiz\n4.Edit username\n5.Edit password\n6.Logout\n7.Delete Account";
     public static String QUESTION_TYPES = "1.Multiple Choice\n2.True or False\n3.Fill in the blank";
     public static String QUESTION_TYPES_WITH_EXIT = "1.Multiple Choice\n2.True or False\n3.Fill in the blank\n4.Exit";
+    public static String QUESTION_EDIT_PROMPT = "1.Add a question\n2.Edit a question\n3.Delete a question";
 
     public static String QUIZ_NAME_PROMPT = "What is the name of the quiz?";
     public static String QUESTION_PROMPT = "What is the the question you want to ask?";
@@ -22,6 +23,34 @@ public class ControlFlow {
     public static String ANSWER_PROMPT = "What is the answer for this question";
 
 
+    public static void reWriterUserFile(ArrayList<User> users) { //do this when they delete their account, change username, password, or any other user attribute that is stored
+        File f = new File(USER_INFO_FILE_NAME);
+        String descriptor;
+        FileWriter fwr = null;
+        try {
+            fwr = new FileWriter(f, false);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (var v: users) {
+            if (v instanceof Teacher) {
+                descriptor = "Teacher";
+            } else {
+                descriptor = "Student";
+            }
+            try {
+                fwr.append(String.format("%s,%s,%s\n",v.getUsername(), v.getPassword(), descriptor));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            fwr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public static int readInt(Scanner scanner, String prompt, int minVal, int maxVal) {
@@ -53,10 +82,10 @@ public class ControlFlow {
 
         System.out.println(ANSWER_PROMPT);
         String answer = scanner.nextLine();
-        
+
         FillBlankQuestion question = new FillBlankQuestion(prompt, answer);
         return question;
-        
+
     }
 
     public static MCquestion createMCquestion(Scanner scanner) {
@@ -93,7 +122,10 @@ public class ControlFlow {
         while(questionType != 4) {
             if (questionType == 1) {
                 currentQuiz.addQuestion(createMCquestion(scanner));
-            } else if (questionType == 2) {
+            } else if (questionType == 2){
+
+            }
+            else if (questionType == 3) {
                 currentQuiz.addQuestion(createFillBlankQuestion(scanner));
             }
 
@@ -205,29 +237,91 @@ public class ControlFlow {
                 currentUser.toFile(USER_INFO_FILE_NAME);
             }
 
-            if (loggedIn && currentUser instanceof Teacher) {
+            while (loggedIn && currentUser instanceof Teacher) { //fixme, was previously if instead of while
                 int loggedInChoice = readInt(scanner, "What do you want to do\n" + LOGGED_IN_TEACHER_OPTIONS, 1,7);
                 scanner.nextLine();
 
                 switch(loggedInChoice) {
                     case 1:
-                            Quiz quiz = createQuiz(scanner);
-                            quizzes.add(quiz);
-                            break;
+                        Quiz quiz = createQuiz(scanner);
+                        quizzes.add(quiz);
+                        break;
                     case 2:
-                        //FIXME
+                        if (quizzes.size() == 0) {
+                            System.out.println("There are no quizzes. You can't edit any.");
+                            break;
+                        }
+                        String listedQuizzes = "";
+                        for (int i = 1; i <= quizzes.size(); i++) {
+                            listedQuizzes += String.format("%d.%s%n", i, quizzes.get(i-1).getQuizName());
+                        }
+                        int editIndex = readInt(scanner,"Which quiz do you want to edit?\n" + listedQuizzes, 1 ,quizzes.size());
+                        Quiz quizToEdit = quizzes.get(editIndex - 1);//subtract 1 since they are listed counting up from 1
+
+
+                        int editType = readInt(scanner, "How do you want to edit the quiz?\n" + QUESTION_EDIT_PROMPT, 1, 3);
+
+                        if (editType == 1) {
+                            int questionType = readInt(scanner, "What type of question do you want to add?\n" + QUESTION_TYPES, 1, 3);
+                            scanner.nextLine();
+                            if (questionType == 1) {
+                                quizToEdit.addQuestion(createMCquestion(scanner));
+                            } else if (questionType == 2) {
+                                quizToEdit.addQuestion(createFillBlankQuestion(scanner));
+                            }
+                        } else if (editType == 2) {
+                            String listedQuestions = "";
+                            ArrayList<Question>  questions = quizToEdit.getQuestions();
+                            if(questions.size() == 0) {
+                                System.out.println("There are no questions in this quiz, you can't edit any");
+                                break;
+                            }
+
+                            for(int i = 1; i <= quizToEdit.getQuestionCount(); i++) {
+                                listedQuestions += String.format("%d.%s%n", i, questions.get(i-1).getQuestion());
+                            }
+                            int questionEditIndex = readInt(scanner, "Which question do you want to edit?\n" + QUESTION_TYPES, 1, questions.size());
+
+                            int questionType = readInt(scanner, "What type of question do you want to add?\n" + QUESTION_TYPES, 1, 3);
+                            scanner.nextLine();
+
+                            if (questionType == 1) {
+                                quizToEdit.setQuestion(questionEditIndex - 1, createMCquestion(scanner));
+                            } else if (questionType == 2){
+
+                            }
+                            else if (questionType == 3) {
+                                quizToEdit.setQuestion(questionEditIndex - 1, createFillBlankQuestion(scanner));
+                            }
+
+                        } else if (editType == 3) {
+                            String listedQuestions = "";
+                            ArrayList<Question> questions = quizToEdit.getQuestions();
+
+                            if(questions.size() == 0) {
+                                System.out.println("There are no questions in this quiz, you can't delete any");
+                                break;
+                            }
+
+                            for(int i = 1; i <= quizToEdit.getQuestionCount(); i++) {
+                                listedQuestions += String.format("%d.%s%n", i, questions.get(i-1).getQuestion());
+                            }
+                            int delIndex = readInt(scanner, "Which question do you want to delete?\n" + listedQuestions, 1, questions.size());
+                            quizToEdit.deleteQuestion(delIndex - 1);
+                        }
+
                         break;
                     case 3:
                         if (quizzes.size() == 0) {
                             System.out.println("There are no quizzes. You can't delete.");
                             break;
                         }
-                        String listedQuizzes = "";
-                        for (int i = 1; i < quizzes.size(); i++) {
-                            listedQuizzes += String.format("%d.%s%n",i, quizzes.get(i));
+                        String listedQuizzes1 = "";
+                        for (int i = 1; i <= quizzes.size(); i++) {
+                            listedQuizzes1 += String.format("%d.%s%n",i, quizzes.get(i-1).getQuizName());
                         }
-                        int delIndex = readInt(scanner,"Which quiz do you want to delete?" + listedQuizzes, 1 ,quizzes.size());
-                        quizzes.remove(delIndex);
+                        int delIndex = readInt(scanner,"Which quiz do you want to delete?\n" + listedQuizzes1, 1 ,quizzes.size());
+                        quizzes.remove(delIndex - 1); //subtract 1 since you start at 1 instead of 0
                         break;
                     case 4:
                         boolean validUsername = false;
@@ -274,6 +368,7 @@ public class ControlFlow {
 
             } while(choice != 3);
 
+        reWriterUserFile(users); //only do this if there was a change, otherwise it is not efficient especially as the user size grows fixme
         System.out.println(EXIT_MESSAGE);
     }
 }
