@@ -22,6 +22,7 @@ public class ControlFlow {
     public static String FOURTH_MC_CHOICE = "What is the value of the fourth choice: ";
     public static String ANSWER_PROMPT = "What is the answer for this question";
 
+    public static String TRUE_FALSE_SELECTION = "1.True\n2.False";
 
     public static void reWriterUserFile(ArrayList<User> users) { //do this when they delete their account, change username, password, or any other user attribute that is stored
         File f = new File(USER_INFO_FILE_NAME);
@@ -51,7 +52,6 @@ public class ControlFlow {
             e.printStackTrace();
         }
     }
-
 
     public static int readInt(Scanner scanner, String prompt, int minVal, int maxVal) {
         int num = 0;
@@ -111,6 +111,26 @@ public class ControlFlow {
 
     }
 
+    public static TFquestion createTFquestion(Scanner scanner) {
+        String prompt;
+        boolean answer;
+        int temp;
+
+        System.out.println(QUESTION_PROMPT);
+        prompt = scanner.nextLine();
+
+        temp = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
+
+        if (temp == 1) {
+            answer = true;
+        } else {
+            answer = false;
+        }
+
+        return new TFquestion(prompt, answer);
+
+    }
+
     public static Quiz createQuiz(Scanner scanner) {
         System.out.println(QUIZ_NAME_PROMPT);
         String quizName = scanner.nextLine();
@@ -123,7 +143,7 @@ public class ControlFlow {
             if (questionType == 1) {
                 currentQuiz.addQuestion(createMCquestion(scanner));
             } else if (questionType == 2){
-
+                currentQuiz.addQuestion(createTFquestion(scanner));
             }
             else if (questionType == 3) {
                 currentQuiz.addQuestion(createFillBlankQuestion(scanner));
@@ -137,6 +157,40 @@ public class ControlFlow {
 
 
     }
+
+    public static String readValidPassword(Scanner scanner) {
+        boolean validPassword = false;
+        String password;
+        do {
+            System.out.println("Enter a new password: "); //maybe have them enter their password to be even allowed
+            password = scanner.nextLine();
+            if (password.contains(",")) {
+                System.out.println("Passwords can not contain a comma, try again");
+            }
+            else {
+                validPassword = true;
+            }
+        } while(!validPassword);
+
+        return password;
+    }
+
+    public static String readValidUsername(Scanner scanner) {
+        boolean validUsername = false;
+        String username;
+        do {
+            System.out.println("Enter a new username: ");
+            username = scanner.nextLine();
+            if (username.contains(",")) {
+                System.out.println("Usernames can not contain a comma, try again");
+            }
+            else {
+                validUsername = true;
+            }
+        } while(!validUsername);
+        return username;
+    }
+
 
 
     public static void main(String[] args) {
@@ -152,7 +206,6 @@ public class ControlFlow {
         System.out.println(WELCOME_MESSAGE);
         choice = readInt(scanner, NOT_LOGGED_IN_OPTIONS, 1, 3);
         scanner.nextLine();
-
 
 
         ArrayList<User> users = new ArrayList<User>();
@@ -179,7 +232,7 @@ public class ControlFlow {
             e.printStackTrace();
         }
 
-        do {
+        while (choice != 3) {
 
             if (choice == 1) {
 
@@ -192,8 +245,9 @@ public class ControlFlow {
                 if (users.contains(new User(username, password))) {
                     System.out.println(SUCCESSFUL_LOGIN);
                     loggedIn = true;
+                    currentUser = users.get(users.indexOf(new User(username, password)));
                 } else {
-                    System.out.println("Login failed");
+                    System.out.println("Login failed, enter a valid username and password");
                 }
 
             }
@@ -202,33 +256,12 @@ public class ControlFlow {
                 int userType = readInt(scanner, "What type of account do you want to make?\n" + USER_TYPE_OPTIONS, 1,2);
                 scanner.nextLine();
 
-                boolean validUsername = false;
-                boolean validPassword = false;
-                do {
-                    System.out.println("Enter a new username: ");
-                    username = scanner.nextLine();
-                    if (username.contains(",")) {
-                        System.out.println("Usernames can not contain a comma, try again");
-                    }
-                    else {
-                        validUsername = true;
-                    }
-                } while(!validUsername);
-
-                do {
-                    System.out.println("Enter a new password: ");
-                    password = scanner.nextLine();
-                    if (password.contains(",")) {
-                        System.out.println("Passwords can not contain a comma, try again");
-                    }
-                    else {
-                        validPassword = true;
-                    }
-                } while(!validPassword);
+                username = readValidUsername(scanner);
+                password = readValidPassword(scanner);
 
                 if (userType == 1) {
                     currentUser = new Teacher(username, password);
-                    users.add(currentUser);//fixme make student
+                    users.add(currentUser); //FIXME make student
                 } else if (userType == 2) {
                     currentUser = new Teacher(username, password);
                     users.add(currentUser);
@@ -237,7 +270,7 @@ public class ControlFlow {
                 currentUser.toFile(USER_INFO_FILE_NAME);
             }
 
-            while (loggedIn && currentUser instanceof Teacher) { //fixme, was previously if instead of while
+            while (loggedIn && currentUser instanceof Teacher) {
                 int loggedInChoice = readInt(scanner, "What do you want to do\n" + LOGGED_IN_TEACHER_OPTIONS, 1,7);
                 scanner.nextLine();
 
@@ -267,46 +300,39 @@ public class ControlFlow {
                             if (questionType == 1) {
                                 quizToEdit.addQuestion(createMCquestion(scanner));
                             } else if (questionType == 2) {
+                                quizToEdit.addQuestion(createTFquestion(scanner));
+                            } else if (questionType == 3) {
                                 quizToEdit.addQuestion(createFillBlankQuestion(scanner));
                             }
                         } else if (editType == 2) {
-                            String listedQuestions = "";
-                            ArrayList<Question>  questions = quizToEdit.getQuestions();
-                            if(questions.size() == 0) {
+
+                            if(quizToEdit.getQuestionCount() == 0) {
                                 System.out.println("There are no questions in this quiz, you can't edit any");
                                 break;
                             }
 
-                            for(int i = 1; i <= quizToEdit.getQuestionCount(); i++) {
-                                listedQuestions += String.format("%d.%s%n", i, questions.get(i-1).getQuestion());
-                            }
-                            int questionEditIndex = readInt(scanner, "Which question do you want to edit?\n" + QUESTION_TYPES, 1, questions.size());
-
-                            int questionType = readInt(scanner, "What type of question do you want to add?\n" + QUESTION_TYPES, 1, 3);
+                            int questionEditIndex = readInt(scanner, "Which question do you want to edit?\n" + quizToEdit, 1, quizToEdit.getQuestionCount());
+                            //fixme add a scanner.nextline right here possibly
+                            int questionType = readInt(scanner, "What type of question do you want to replace it with?\n" + QUESTION_TYPES, 1, 3);
                             scanner.nextLine();
 
                             if (questionType == 1) {
                                 quizToEdit.setQuestion(questionEditIndex - 1, createMCquestion(scanner));
                             } else if (questionType == 2){
-
+                                quizToEdit.setQuestion(questionEditIndex - 1, createTFquestion(scanner));
                             }
                             else if (questionType == 3) {
                                 quizToEdit.setQuestion(questionEditIndex - 1, createFillBlankQuestion(scanner));
                             }
 
                         } else if (editType == 3) {
-                            String listedQuestions = "";
-                            ArrayList<Question> questions = quizToEdit.getQuestions();
 
-                            if(questions.size() == 0) {
+                            if(quizToEdit.getQuestionCount() == 0) {
                                 System.out.println("There are no questions in this quiz, you can't delete any");
                                 break;
                             }
 
-                            for(int i = 1; i <= quizToEdit.getQuestionCount(); i++) {
-                                listedQuestions += String.format("%d.%s%n", i, questions.get(i-1).getQuestion());
-                            }
-                            int delIndex = readInt(scanner, "Which question do you want to delete?\n" + listedQuestions, 1, questions.size());
+                            int delIndex = readInt(scanner, "Which question do you want to delete?\n" + quizToEdit, 1, quizToEdit.getQuestionCount());
                             quizToEdit.deleteQuestion(delIndex - 1);
                         }
 
@@ -324,49 +350,26 @@ public class ControlFlow {
                         quizzes.remove(delIndex - 1); //subtract 1 since you start at 1 instead of 0
                         break;
                     case 4:
-                        boolean validUsername = false;
-                        do {
-                            System.out.println("Enter a new username: ");
-                            username = scanner.nextLine();
-                            if (username.contains(",")) {
-                                System.out.println("Usernames can not contain a comma, try again");
-                            }
-                            else {
-                                validUsername = true;
-                            }
-                        } while(!validUsername);
-                        currentUser.setUsername(username);
+                        currentUser.setUsername(readValidUsername(scanner));
                         break;
                     case 5:
-                        boolean validPassword = false;
-                        do {
-                            System.out.println("Enter a new password: "); //maybe have them enter their password to be even allowed
-                            password = scanner.nextLine();
-                            if (password.contains(",")) {
-                                System.out.println("Passwords can not contain a comma, try again");
-                            }
-                            else {
-                                validPassword = true;
-                            }
-                        } while(!validPassword);
-                        currentUser.setPassword(password);
+                        currentUser.setPassword(readValidPassword(scanner));
                         break;
                     case 6:
                         loggedIn = false;
                         currentUser = null;
                         break;
                     case 7:
-                        //FIXME
-                        break;
-
+                        users.remove(currentUser);
+                        reWriterUserFile(users);
+                        loggedIn = false;
                 }
             }
-
 
             choice = readInt(scanner, NOT_LOGGED_IN_OPTIONS, 1, 3);
             scanner.nextLine();
 
-            } while(choice != 3);
+            }
 
         reWriterUserFile(users); //only do this if there was a change, otherwise it is not efficient especially as the user size grows fixme
         System.out.println(EXIT_MESSAGE);
