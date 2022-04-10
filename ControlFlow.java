@@ -1,5 +1,3 @@
-package com.example.testing;
-
 import java.util.*;
 import java.io.*;
 //Requires a "UsersInfo.txt" file to function properly
