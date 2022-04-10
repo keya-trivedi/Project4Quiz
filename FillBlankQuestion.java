@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class FillBlankQuestion extends Question{
     private String answer;
 
@@ -25,5 +27,11 @@ public class FillBlankQuestion extends Question{
         return answer.equals(that.answer) && question.equals(that.question);
     }
 
+    public AnsweredQuestion getAnswer(Scanner scanner) { //return true if it is the right answer
+        System.out.println(question);
 
+        String ans = scanner.nextLine();
+
+        return new AnsweredQuestion(this, ans, check(ans));
+    }
 }

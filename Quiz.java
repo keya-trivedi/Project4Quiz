@@ -7,11 +7,13 @@ import java.util.Objects;
 
 public class Quiz {
     private String quizName;
-    ArrayList<Question> questions;
+    private ArrayList<Question> questions;
+    private ArrayList<QuizSubmission> submissions;
 
     public Quiz(String quizName) {
         this.quizName = quizName;
         this.questions = new ArrayList<Question>();
+        this.submissions = new ArrayList<QuizSubmission>();
     }
 
     public void addQuestion(Question question) {
@@ -102,4 +104,9 @@ public class Quiz {
         }
         return str;
     }
+
+    public void addSubmission(QuizSubmission submission) {
+        this.submissions.add(submission);
+    }
+
 }

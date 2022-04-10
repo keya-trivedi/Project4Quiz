@@ -24,6 +24,9 @@ public class ControlFlow {
 
     public static String COURSE_LEVEL_VIEW_OPTIONS ="1.Make a course\n2.Enter a course\n3.Delete a course\n4.Edit username\n5.Edit password\n6.Logout\n7.Delete Account";
 
+    public static String STUDENT_COURSE_LEVEL_VIEW_OPTIONS = "1.Enter a course\n2.Edit username\n3.Edit password\n4.Logout\n5.Delete Account";
+    public static String STUDENT_IN_COURSE_OPTIONS = "1.Take a quiz\n2.Edit username\n3.Edit password\n4.Logout\n5.Delete Account";
+
 
     public static String TRUE_FALSE_SELECTION = "1.True\n2.False";
 
@@ -153,6 +156,7 @@ public class ControlFlow {
             }
 
             questionType = readInt(scanner, "What type of question do you want to add?\n" + QUESTION_TYPES_WITH_EXIT, 1, 4);
+            scanner.nextLine();
 
         }
 
@@ -211,6 +215,7 @@ public class ControlFlow {
 
     public static void main(String[] args) {
 
+
         Scanner scanner = new Scanner(System.in);
         String username;
         String password;
@@ -218,6 +223,7 @@ public class ControlFlow {
         int choice;
         boolean loggedIn = false;
         User currentUser = null;
+        Course currentCourse;
 
         System.out.println(WELCOME_MESSAGE);
         choice = readInt(scanner, NOT_LOGGED_IN_OPTIONS, 1, 3);
@@ -225,7 +231,7 @@ public class ControlFlow {
 
 
         ArrayList<User> users = new ArrayList<User>();
-        ArrayList<Quiz> quizzes = new ArrayList<Quiz>();
+        //ArrayList<Quiz> quizzes = new ArrayList<Quiz>();
 
         ArrayList<Course> courses = new ArrayList<Course>();
 
@@ -240,9 +246,9 @@ public class ControlFlow {
                 String[] attributes = line.split(",");
 
                 if (attributes[2].equals("Teacher")) {
-                    users.add(new Teacher(username = attributes[0], password = attributes[1]));
+                    users.add(new Teacher(attributes[0], attributes[1]));
                 } else if (attributes[2].equals("Student")) {
-                    //users.add(new Student(username=attributes[0], password=attributes[1])) FIXME
+                    users.add(new Student(attributes[0], attributes[1]));
                 }
                 line = br.readLine();
             }
@@ -296,7 +302,7 @@ public class ControlFlow {
 
 
                 if (userType == 1) {
-                    currentUser = new Teacher(username, password);
+                    currentUser = new Student(username, password);
                     users.add(currentUser); //FIXME make student
                 } else if (userType == 2) {
                     currentUser = new Teacher(username, password);
@@ -322,9 +328,16 @@ public class ControlFlow {
                         }
                         String courseList = "";
                         for (int i = 0; i < courses.size(); i++) {
-                            courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            if(i != courses.size()-1) {
+                                courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            } else {
+                                courseList += String.format("%d.%s %s", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber()); //no need for the newline at the end if its the last one
+                            }
                         }
-                        readInt(scanner, "Which course do you want to edit\n" + courseList, 1, courses.size());
+                        int courseEditIndex = readInt(scanner, "Which course do you want to edit\n" + courseList, 1, courses.size());
+
+                        currentCourse = courses.get(courseEditIndex - 1);
+
                         //FIXME, send them into this courses quizzes, maybe put them in the for loop
                         loggedInChoice = readInt(scanner, "What do you want to do\n" + LOGGED_IN_TEACHER_OPTIONS, 1, 7);
                         scanner.nextLine();
@@ -332,19 +345,19 @@ public class ControlFlow {
                         switch (loggedInChoice) {
                             case 1:
                                 Quiz quiz = createQuiz(scanner);
-                                quizzes.add(quiz);
+                                currentCourse.addQuiz(quiz); //fixme
                                 break;
                             case 2:
-                                if (quizzes.size() == 0) {
+                                if (currentCourse.getQuizCount() == 0) {
                                     System.out.println("There are no quizzes. You can't edit any.");
                                     break;
                                 }
                                 String listedQuizzes = "";
-                                for (int i = 1; i <= quizzes.size(); i++) {
-                                    listedQuizzes += String.format("%d.%s%n", i, quizzes.get(i - 1).getQuizName());
+                                for (int i = 1; i <= currentCourse.getQuizCount(); i++) {
+                                    listedQuizzes += String.format("%d.%s%n", i, currentCourse.getQuiz(i - 1).getQuizName());
                                 }
-                                int editIndex = readInt(scanner, "Which quiz do you want to edit?\n" + listedQuizzes, 1, quizzes.size());
-                                Quiz quizToEdit = quizzes.get(editIndex - 1);//subtract 1 since they are listed counting up from 1
+                                int editIndex = readInt(scanner, "Which quiz do you want to edit?\n" + listedQuizzes, 1, currentCourse.getQuizCount());
+                                Quiz quizToEdit = currentCourse.getQuiz(editIndex - 1);//subtract 1 since they are listed counting up from 1
 
 
                                 int editType = readInt(scanner, "How do you want to edit the quiz?\n" + QUESTION_EDIT_PROMPT, 1, 3);
@@ -392,16 +405,16 @@ public class ControlFlow {
 
                                 break;
                             case 3:
-                                if (quizzes.size() == 0) {
+                                if (currentCourse.getQuizCount() == 0) {
                                     System.out.println("There are no quizzes. You can't delete.");
                                     break;
                                 }
                                 String listedQuizzes1 = "";
-                                for (int i = 1; i <= quizzes.size(); i++) {
-                                    listedQuizzes1 += String.format("%d.%s%n", i, quizzes.get(i - 1).getQuizName());
+                                for (int i = 1; i <= currentCourse.getQuizCount(); i++) {
+                                    listedQuizzes1 += String.format("%d.%s%n", i, currentCourse.getQuiz(i - 1).getQuizName());
                                 }
-                                int delIndex = readInt(scanner, "Which quiz do you want to delete?\n" + listedQuizzes1, 1, quizzes.size());
-                                quizzes.remove(delIndex - 1); //subtract 1 since you start at 1 instead of 0
+                                int delIndex = readInt(scanner, "Which quiz do you want to delete?\n" + listedQuizzes1, 1, currentCourse.getQuizCount());
+                                currentCourse.removeQuiz(delIndex - 1); //subtract 1 since you start at 1 instead of 0
                                 break;
                             case 4:
                                 currentUser.setUsername(readValidUsername(scanner));
@@ -419,6 +432,7 @@ public class ControlFlow {
                                 loggedIn = false;
                                 break;
                         }
+                        break;
                     case 3:
                         if (courses.size() == 0) {
                             System.out.println("There are no courses made. You need to add courses before deleting them");
@@ -449,6 +463,82 @@ public class ControlFlow {
                 }
             }
 
+            while (loggedIn && currentUser instanceof Student) {
+                int loggedInChoice = readInt(scanner, "What do you want to do\n" + STUDENT_COURSE_LEVEL_VIEW_OPTIONS, 1, 5);
+                scanner.nextLine();
+
+                switch (loggedInChoice) {
+                    case 1:
+                        if(courses.size() == 0) {
+                            System.out.println("There have been no courses made yet. Tell your teachers to make them first.");
+                            break;
+                        }
+                        String courseList = "";
+                        for (int i = 0; i < courses.size(); i++) {
+                            courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                        }
+                        int courseIndex = readInt(scanner, "Which course do you want to enter\n" + courseList, 1, courses.size());
+                        currentCourse = courses.get(courseIndex - 1);
+
+                        int inCourseChoice = readInt(scanner, "What do you want to do\n" + STUDENT_IN_COURSE_OPTIONS, 1, courses.size());
+
+                        switch(inCourseChoice) {
+                            case 1:
+                                if (currentCourse.getQuizzes().size() == 0) {
+                                    System.out.println("There are no quizzes for this class :)");
+                                    break;
+                                }
+                                Quiz quizToTake = currentCourse.getQuiz(readInt(scanner, "Which quiz do you want to take?\n" + currentCourse, 1, currentCourse.getQuizCount())-1);
+
+                                quizToTake.addSubmission(new QuizSubmission(quizToTake, scanner));
+
+
+                                //fixme and implement a way to take quizzes and store submissions
+
+
+                                //need to list quizzes
+                                break;
+                            case 2: //change username
+                                currentUser.setUsername(readValidUsername(scanner));
+                                break;
+                            case 3: //change password
+                                currentUser.setPassword(readValidPassword(scanner));
+                                break;
+                            case 4: //logout
+                                loggedIn = false;
+                                currentUser = null;
+                                break;
+                            case 5: //delete account
+                                users.remove(currentUser);
+                                reWriterUserFile(users);
+                                loggedIn = false;
+                                break;
+
+                        }
+
+
+
+                        break;
+                    case 2: //change username
+                        currentUser.setUsername(readValidUsername(scanner));
+                        break;
+                    case 3: //change password
+                        currentUser.setPassword(readValidPassword(scanner));
+                        break;
+                    case 4: //logout
+                        loggedIn = false;
+                        currentUser = null;
+                        break;
+                    case 5: //delete account
+                        users.remove(currentUser);
+                        reWriterUserFile(users);
+                        loggedIn = false;
+                        break;
+
+                }
+
+            }
+
 
             choice = readInt(scanner, NOT_LOGGED_IN_OPTIONS, 1, 3);
             scanner.nextLine();
@@ -457,8 +547,8 @@ public class ControlFlow {
             reWriterUserFile(users); //only do this if there was a change, otherwise it is not efficient especially as the user size grows fixme
             System.out.println(EXIT_MESSAGE);
 
+
             }
 
 
 }
-
