@@ -28,7 +28,7 @@ public class AnsweredQuestion {
         } else {
             correctPhrase = "Wrong!";
         }
-        return String.format("Question: %s. They answered %s and the answer was %s. %s", this.question.getQuestion(), this.answer, correctPhrase);
+        return String.format("Question: %s. They answered %s. %s", this.question.getQuestion(), this.answer, correctPhrase);
     }
 
 }
