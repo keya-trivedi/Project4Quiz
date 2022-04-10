@@ -30,8 +30,14 @@ public class FillBlankQuestion extends Question{
     public AnsweredQuestion getAnswer(Scanner scanner) { //return true if it is the right answer
         System.out.println(question);
 
+        if (scanner.hasNext()) {
+            scanner.nextLine(); //eat the newline char
+        }
         String ans = scanner.nextLine();
 
         return new AnsweredQuestion(this, ans, check(ans));
+
     }
+
+
 }

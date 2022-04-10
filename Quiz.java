@@ -100,13 +100,21 @@ public class Quiz {
     public String toString() {
         String str = "";
         for(int i = 0; i < questions.size(); i++) {
-            str += String.format("%d.%s%n", i + 1, questions.get(i).getQuestion());
+            if(i != questions.size() - 1) {
+                str += String.format("%d.%s%n", i + 1, questions.get(i).getQuestion());
+            } else {
+                str += String.format("%d.%s", i + 1, questions.get(i).getQuestion());
+            }
         }
         return str;
     }
 
     public void addSubmission(QuizSubmission submission) {
         this.submissions.add(submission);
+    }
+
+    public ArrayList<QuizSubmission> getSubmissions() {
+        return submissions;
     }
 
 }

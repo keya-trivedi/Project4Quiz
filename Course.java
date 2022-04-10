@@ -39,7 +39,11 @@ public class Course {
     public String toString() {
         String str = "";
         for (int i = 0; i < quizzes.size(); i++) {
-            str += String.format("%d.%s%n", i + 1, quizzes.get(i).getQuizName());
+            if(i != quizzes.size() - 1) {
+                str += String.format("%d.%s%n", i + 1, quizzes.get(i).getQuizName());
+            } else {
+                str += String.format("%d.%s", i + 1, quizzes.get(i).getQuizName());
+            }
         }
         return str;
     }
@@ -66,6 +70,5 @@ public class Course {
     public int getQuizCount() {
         return quizzes.size();
     }
-
-
+    
 }

@@ -21,4 +21,14 @@ public class AnsweredQuestion {
         return correct;
     }
 
+    public String toString() {
+        String correctPhrase;
+        if (this.correct) {
+            correctPhrase = "Correct!";
+        } else {
+            correctPhrase = "Wrong!";
+        }
+        return String.format("Question: %s. They answered %s and the answer was %s. %s", this.question.getQuestion(), this.answer, correctPhrase);
+    }
+
 }

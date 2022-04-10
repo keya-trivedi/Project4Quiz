@@ -1,3 +1,5 @@
+package com.example.testing;
+
 import java.util.*;
 import java.io.*;
 //Requires a "UsersInfo.txt" file to function properly
@@ -9,7 +11,8 @@ public class ControlFlow {
     public static String SUCCESSFUL_LOGIN = "Login Successful!";
     public static String USER_TYPE_OPTIONS = "1.Student\n2.Teacher";
     public static String EXIT_MESSAGE = "Quiz manager shutting down...Have a great day!";
-    public static String LOGGED_IN_TEACHER_OPTIONS ="1.Make a quiz\n2.Edit a quiz\n3.Delete quiz\n4.Edit username\n5.Edit password\n6.Logout\n7.Delete Account";
+    public static String LOGGED_IN_TEACHER_OPTIONS ="1.Make a quiz\n2.Edit a quiz\n3.Delete quiz\n4.View quiz submissions\n5.Edit username\n6.Edit password\n7.Logout\n8.Delete Account";
+
     public static String QUESTION_TYPES = "1.Multiple Choice\n2.True or False\n3.Fill in the blank";
     public static String QUESTION_TYPES_WITH_EXIT = "1.Multiple Choice\n2.True or False\n3.Fill in the blank\n4.Exit";
     public static String QUESTION_EDIT_PROMPT = "1.Add a question\n2.Edit a question\n3.Delete a question";
@@ -339,7 +342,7 @@ public class ControlFlow {
                         currentCourse = courses.get(courseEditIndex - 1);
 
                         //FIXME, send them into this courses quizzes, maybe put them in the for loop
-                        loggedInChoice = readInt(scanner, "What do you want to do\n" + LOGGED_IN_TEACHER_OPTIONS, 1, 7);
+                        loggedInChoice = readInt(scanner, "What do you want to do\n" + LOGGED_IN_TEACHER_OPTIONS, 1, 8);
                         scanner.nextLine();
 
                         switch (loggedInChoice) {
@@ -354,7 +357,11 @@ public class ControlFlow {
                                 }
                                 String listedQuizzes = "";
                                 for (int i = 1; i <= currentCourse.getQuizCount(); i++) {
-                                    listedQuizzes += String.format("%d.%s%n", i, currentCourse.getQuiz(i - 1).getQuizName());
+                                    if (i != currentCourse.getQuizCount()) {
+                                        listedQuizzes += String.format("%d.%s%n", i, currentCourse.getQuiz(i - 1).getQuizName());
+                                    } else {
+                                        listedQuizzes += String.format("%d.%s", i, currentCourse.getQuiz(i - 1).getQuizName());
+                                    }
                                 }
                                 int editIndex = readInt(scanner, "Which quiz do you want to edit?\n" + listedQuizzes, 1, currentCourse.getQuizCount());
                                 Quiz quizToEdit = currentCourse.getQuiz(editIndex - 1);//subtract 1 since they are listed counting up from 1
@@ -411,22 +418,46 @@ public class ControlFlow {
                                 }
                                 String listedQuizzes1 = "";
                                 for (int i = 1; i <= currentCourse.getQuizCount(); i++) {
+
                                     listedQuizzes1 += String.format("%d.%s%n", i, currentCourse.getQuiz(i - 1).getQuizName());
                                 }
                                 int delIndex = readInt(scanner, "Which quiz do you want to delete?\n" + listedQuizzes1, 1, currentCourse.getQuizCount());
                                 currentCourse.removeQuiz(delIndex - 1); //subtract 1 since you start at 1 instead of 0
                                 break;
                             case 4:
-                                currentUser.setUsername(readValidUsername(scanner));
+                                int quizToViewIndex = readInt(scanner, "Which quiz do you want to view submission for?\n" + currentCourse, 1, currentCourse.getQuizCount());
+                                scanner.nextLine();
+
+                                Quiz quizToView = currentCourse.getQuiz(quizToViewIndex - 1);
+
+                                String submissionList = "";
+                                for(int i = 0; i < quizToView.getSubmissions().size(); i++){
+                                    if(i != quizToView.getSubmissions().size() - 1) {
+                                        submissionList += String.format("%d.%s%n", i+1, quizToView.getSubmissions().get(i));
+                                    } else {
+                                        submissionList += String.format("%d.%s", i+1, quizToView.getSubmissions().get(i));
+                                    }
+                                }
+                                int submissionIndex = readInt(scanner, "Which quiz do you want to view submission for?\n" + submissionList, 1, currentCourse.getQuizCount());
+                                scanner.nextLine();
+
+                                QuizSubmission sub = quizToView.getSubmissions().get(submissionIndex - 1);
+
+                                for (AnsweredQuestion ans: sub.getAnsweredQuestions()) {
+                                    System.out.println(ans);
+                                }
                                 break;
                             case 5:
-                                currentUser.setPassword(readValidPassword(scanner));
+                                currentUser.setUsername(readValidUsername(scanner));
                                 break;
                             case 6:
+                                currentUser.setPassword(readValidPassword(scanner));
+                                break;
+                            case 7:
                                 loggedIn = false;
                                 currentUser = null;
                                 break;
-                            case 7:
+                            case 8:
                                 users.remove(currentUser);
                                 reWriterUserFile(users);
                                 loggedIn = false;
@@ -440,7 +471,11 @@ public class ControlFlow {
                         }
                         courseList = "";
                         for (int i = 0; i < courses.size(); i++) {
-                            courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            if (i != courses.size() - 1) {
+                                courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            } else {
+                                courseList += String.format("%d.%s %s", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            }
                         }
                         int delIndex = readInt(scanner, "Which course do you want to delete\n" + courseList, 1, courses.size());
                         courses.remove(delIndex - 1);
@@ -475,7 +510,11 @@ public class ControlFlow {
                         }
                         String courseList = "";
                         for (int i = 0; i < courses.size(); i++) {
-                            courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            if(i != courses.size() - 1) {
+                                courseList += String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            } else {
+                                courseList += String.format("%d.%s %s", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber());
+                            }
                         }
                         int courseIndex = readInt(scanner, "Which course do you want to enter\n" + courseList, 1, courses.size());
                         currentCourse = courses.get(courseIndex - 1);
@@ -490,7 +529,7 @@ public class ControlFlow {
                                 }
                                 Quiz quizToTake = currentCourse.getQuiz(readInt(scanner, "Which quiz do you want to take?\n" + currentCourse, 1, currentCourse.getQuizCount())-1);
 
-                                quizToTake.addSubmission(new QuizSubmission(quizToTake, scanner));
+                                quizToTake.addSubmission(new QuizSubmission(quizToTake, scanner, currentUser.getUsername()));
 
 
                                 //fixme and implement a way to take quizzes and store submissions
@@ -552,3 +591,4 @@ public class ControlFlow {
 
 
 }
+
