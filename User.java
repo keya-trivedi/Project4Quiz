@@ -42,7 +42,7 @@ public class User {
         }
 
         try {
-            FileWriter fwr = new FileWriter(f);
+            FileWriter fwr = new FileWriter(f, true);
             fwr.append(String.format("%s,%s,%s\n",username, password, descriptor));
             fwr.close();
 
