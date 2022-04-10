@@ -23,13 +23,16 @@ The question types we allowed the users to make are True and False, Multiple cho
 
 If they enter a course, they will be prompted with the following options.
 1.Make a quiz (Prompts you to make at least 1 question, and keeps asking you for more questions till you choose to exit)
-2.Edit a quiz (Lets you see the questions in a quiz, and prompts you to make a new question replace the question you chose)
+2.Edit a quiz (Lets you edit the quiz, more on this down below)
 3.Delete quiz (Lists all the quizzes and lets you pick which one to delete)
-4.View quiz submissions (Delete a course after being given a list of them to choose from)
+4.View quiz submission (Lets them select a quiz, and then select a submission from the quiz to view it))
 5.Edit username (Change the value of the username attribute within the instance of Teacher or Student that refers to the logged in user)
 6.Edit password (Change the value of the password attribute within the instance of Teacher or Student that refers to the logged in user)
 7.Logout (changes the loggedin variable to false and the current user variable to null. This prompts the user to sign in, log in, or exit)
 8.Delete Account (This deletes the users account from the users list, their username and password will no longer be valid for them logging in)
+
+When the users decides to edit a quiz, they can add a question, delete a question, or replace an existing question with a new one. 
+
 
 The program keeps you in the running loop as long as you don't choose the option to exit. You can only use the exit option if you are not logged in.
 
