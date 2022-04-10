@@ -60,42 +60,6 @@ public class Quiz {
         return quizName;
     }
 
-    public static Quiz fromFile(String fileName) {
-        String line;
-        ArrayList<String> attribs = new ArrayList<>();
-
-        try {
-            File f = new File(fileName);
-            FileReader fr = new FileReader(f);
-            BufferedReader br = new BufferedReader(fr);
-            line = br.readLine();
-
-            while (line != null) {
-                attribs.add(line);
-
-                String[] attributes = line.split(",");
-
-                line = br.readLine();
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Quiz quiz = new Quiz(attribs.get(0));
-
-        int index = 1;
-        while(index < attribs.size()) {
-            if(attribs.get(index).equals("MC")) {
-                quiz.addQuestion(new MCquestion(attribs.get(++index), attribs.get(++index), attribs.get(++index), attribs.get(++index), attribs.get(++index), Integer.parseInt(attribs.get(++index))));
-            } else if(attribs.get(index).equals("FB")) {
-                quiz.addQuestion(new FillBlankQuestion(attribs.get(++index), attribs.get(++index)));
-            } else if(attribs.get(index).equals("TF")) {
-                quiz.addQuestion(new TFquestion(attribs.get(++index), Boolean.parseBoolean(attribs.get(++index))));
-            }
-
-        }
-        return quiz;
-    }
 
     public String toString() {
         String str = "";
@@ -116,5 +80,61 @@ public class Quiz {
     public ArrayList<QuizSubmission> getSubmissions() {
         return submissions;
     }
+
+    public static Quiz fromFile(String fileName) {
+        String line;
+        String question;
+        Quiz quiz = null;
+
+        try {
+            File f = new File(fileName);
+            FileReader fr = new FileReader(f);
+            BufferedReader br = new BufferedReader(fr);
+            line = br.readLine();
+            quiz = new Quiz(line);
+
+            line = br.readLine();
+
+
+            while (line != null) {
+
+                switch(line) {
+                    case "MC":
+                        String c1,c2,c3,c4;
+                        int answer;
+                        question = br.readLine();
+                        c1 = br.readLine();
+                        c2 = br.readLine();
+                        c3 = br.readLine();
+                        c4 = br.readLine();
+                        answer = Integer.parseInt(br.readLine());
+                        quiz.addQuestion(new MCquestion(question, c1, c2, c3, c4, answer));
+                        break;
+                    case "TF":
+                        question = br.readLine();
+                        if (br.readLine().equals("2")) {
+                            quiz.addQuestion(new TFquestion(question, false));
+                        } else {
+                            quiz.addQuestion(new TFquestion(question, true));
+                        }
+                        break;
+                    case "FB":
+                        question = br.readLine();
+                        String blank = br.readLine();
+                        quiz.addQuestion(new FillBlankQuestion(question, blank));
+                        break;
+                }
+
+
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return quiz;
+    }
+
 
 }

@@ -166,6 +166,11 @@ public class ControlFlow {
 
     }
 
+    public static Quiz createQuizFromFile(Scanner scanner) {
+        System.out.println("What file do you want to create the quiz from?");
+        return Quiz.fromFile(scanner.nextLine());
+    }
+
     public static String readValidPassword(Scanner scanner) {
         boolean validPassword = false;
         String password;
@@ -345,8 +350,13 @@ public class ControlFlow {
 
                         switch (loggedInChoice) {
                             case 1:
-                                Quiz quiz = createQuiz(scanner);
-                                currentCourse.addQuiz(quiz); //fixme
+                                int createQuizType = readInt(scanner, "How do you want to make the quiz?\n1.From a file\n2.From the terminal.",1, 2);
+
+                                if(createQuizType == 1) {
+                                    currentCourse.addQuiz(createQuizFromFile(scanner));
+                                } else {
+                                    currentCourse.addQuiz(createQuiz(scanner));
+                                }
                                 break;
                             case 2:
                                 if (currentCourse.getQuizCount() == 0) {
@@ -586,7 +596,5 @@ public class ControlFlow {
 
 
             }
-
-
+            
 }
-
