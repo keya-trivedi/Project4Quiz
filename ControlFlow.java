@@ -351,7 +351,7 @@ public class ControlFlow {
                         switch (loggedInChoice) {
                             case 1:
                                 int createQuizType = readInt(scanner, "How do you want to make the quiz?\n1.From a file\n2.From the terminal.",1, 2);
-
+                                scanner.nextLine();
                                 if(createQuizType == 1) {
                                     currentCourse.addQuiz(createQuizFromFile(scanner));
                                 } else {
@@ -596,5 +596,5 @@ public class ControlFlow {
 
 
             }
-            
+
 }
