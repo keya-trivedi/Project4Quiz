@@ -1,0 +1,14 @@
+Quiz Numero Uno
+TF
+Is the sky brown?
+2
+MC
+What is 4 x 4?
+12
+3
+16
+0
+3
+FB
+The color of the sky during the day is ______.
+Blue
