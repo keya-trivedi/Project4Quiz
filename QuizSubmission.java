@@ -11,7 +11,7 @@ public class QuizSubmission {
     private ArrayList<Question> questionsAsked;
     private ArrayList<AnsweredQuestion> answeredQuestions;
 
-    QuizSubmission(Quiz quiz, Scanner scanner, String username) {
+    public QuizSubmission(Quiz quiz, Scanner scanner, String username) {
         this.quiz = quiz;
         this.username = username;
         this.quizStart = new Date();

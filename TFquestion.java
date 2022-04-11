@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class TFquestion extends Question {
     private boolean answer;
 
-    TFquestion(String question, boolean answer) {
+    public TFquestion(String question, boolean answer) {
         this.answer = answer;
         this.question = question;
     }
