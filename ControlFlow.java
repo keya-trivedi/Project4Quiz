@@ -83,192 +83,64 @@ public class ControlFlow {
         return num;
     }
 
-    public static FillBlankQuestion createFillBlankQuestion(Scanner scanner) throws FileNotFoundException {
-        System.out.println("Would you like to import a file or type in questions?" +
-        "\n1. Import file" +
-        "\n2. Type in");
+    public static FillBlankQuestion createFillBlankQuestion(Scanner scanner) {
+         
+        System.out.println(QUESTION_PROMPT);
+        String prompt = scanner.nextLine();
 
-        int choose;
-        choose = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
+        System.out.println(ANSWER_PROMPT);
+        String answer = scanner.nextLine();
 
-        switch(choose) {
-            case 1:
-                System.out.println("Please enter the file name");
-                fileName = scanner.nextLine();
-
-                File f = new File(fileName);
-                FileReader fr = new FileReader(f);
-                BufferedReader bfr = new BufferedReader(fr);
-
-                try {
-                    String prompt = bfr.readLine();
-                    String answer = bfr.readLine();
-
-                    if (prompt == null || answer == null) {
-                        System.out.println("The question is incomplete!");
-
-                    } else {
-                        FillBlankQuestion question = new FillBlankQuestion(prompt, answer);
-                        return question;
-                    }
-
-
-
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-            
-            
-            
-            case 2:
-
-                System.out.println(QUESTION_PROMPT);
-                String prompt = scanner.nextLine();
-
-                System.out.println(ANSWER_PROMPT);
-                String answer = scanner.nextLine();
-
-                FillBlankQuestion question = new FillBlankQuestion(prompt, answer);
-                return question;
-        }
+        FillBlankQuestion question = new FillBlankQuestion(prompt, answer);
+        return question;
+        
 
     }
 
-    public static MCquestion createMCquestion(Scanner scanner) throws FileNotFoundException {
-        System.out.println("Would you like to import a file or type in questions?" +
-        "\n1. Import file" +
-        "\n2. Type in");
+    public static MCquestion createMCquestion(Scanner scanner) {
 
-        int choose;
-        choose = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
+        System.out.println(QUESTION_PROMPT);
+        String prompt = scanner.nextLine();
 
-        switch(choose) {
-            case 1:
-                System.out.println("Please enter the file name");
-                fileName = scanner.nextLine();
+        System.out.println(FIRST_MC_CHOICE);
+        String choice1 = scanner.nextLine();
 
-                File f = new File(fileName);
-                FileReader fr = new FileReader(f);
-                BufferedReader bfr = new BufferedReader(fr);
+        System.out.println(SECOND_MC_CHOICE);
+        String choice2 = scanner.nextLine();
 
-                try {
-                    String prompt = bfr.readLine();
-                    String choice1 = bfr.readLine();
-                    String choice2 = bfr.readLine();
-                    String choice3 = bfr.readLine();
-                    String choice4 = bfr.readLine();
+        System.out.println(THIRD_MC_CHOICE);
+        String choice3 = scanner.nextLine();
 
-                    int answer = bfr.read();
-                    bfr.close();
+        System.out.println(FOURTH_MC_CHOICE);
+        String choice4 = scanner.nextLine();
 
-                    if (answer < 1 || answer > 4) {
-                        System.out.println("The answer is invalid!");
-                        return;
-                    } else if (prompt == null || choice1 == null || choice2 == null || choice3 == null || choice4 == null) {
-                        System.out.println("The question is incomplete!");
-                        return;
-                    } else {
-                        MCquestion question = new MCquestion(prompt, choice1, choice2, choice3, choice4, answer);
-                        return question;
-                    }
+        int answer = readInt(scanner, ANSWER_PROMPT + "\n1." + choice1 + "\n2." + choice2 + "\n3." + choice3 + "\n4." + choice4,1, 4);
+        MCquestion question = new MCquestion(prompt, choice1, choice2, choice3, choice4, answer);
 
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-
-
-
-            case 2:
-                System.out.println(QUESTION_PROMPT);
-                String prompt = scanner.nextLine();
-
-                System.out.println(FIRST_MC_CHOICE);
-                String choice1 = scanner.nextLine();
-
-                System.out.println(SECOND_MC_CHOICE);
-                String choice2 = scanner.nextLine();
-
-                System.out.println(THIRD_MC_CHOICE);
-                String choice3 = scanner.nextLine();
-
-                System.out.println(FOURTH_MC_CHOICE);
-                String choice4 = scanner.nextLine();
-
-                int answer = readInt(scanner, ANSWER_PROMPT + "\n1." + choice1 + "\n2." + choice2 + "\n3." + choice3 + "\n4." + choice4,1, 4);
-                MCquestion question = new MCquestion(prompt, choice1, choice2, choice3, choice4, answer);
-
-                return question;
-        }
+        return question;
+        
 
     }
 
-    public static TFquestion createTFquestion(Scanner scanner) throws FileNotFoundException {
-        System.out.println("Would you like to import a file or type in questions?" +
-        "\n1. Import file" +
-        "\n2. Type in");
+    public static TFquestion createTFquestion(Scanner scanner) {
 
-        int choose;
-        choose = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
+        String prompt;
+        boolean answer;
+        int temp;
 
-        switch(choose) {
-            case 1:
-                System.out.println("Please enter the file name");
-                fileName = scanner.nextLine();
+        System.out.println(QUESTION_PROMPT);
+        prompt = scanner.nextLine();
 
-                File f = new File(fileName);
-                FileReader fr = new FileReader(f);
-                BufferedReader bfr = new BufferedReader(fr);
+        temp = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
 
-                try {
-                    boolean answer;
-
-                    String prompt = bfr.readLine();
-                    int temp = bfr.read();
-                    if (temp == 1) {
-                        answer = true;
-                    } else {
-                        answer = false;
-                    }
-
-                    if (prompt == null) {
-                        System.out.println("The question is incomplete!");
-                        return;
-
-                    } else {
-
-                        return new TFquestion(prompt, answer);
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-
-
-            case 2:
-
-                String prompt;
-                boolean answer;
-                int temp;
-
-                System.out.println(QUESTION_PROMPT);
-                prompt = scanner.nextLine();
-
-                temp = readInt(scanner, ANSWER_PROMPT + "\n" + TRUE_FALSE_SELECTION, 1, 2);
-
-                if (temp == 1) {
-                    answer = true;
-                } else {
-                    answer = false;
-                }
-
-                return new TFquestion(prompt, answer);
+        if (temp == 1) {
+            answer = true;
+        } else {
+            answer = false;
         }
+
+        return new TFquestion(prompt, answer);
+
 
     }
 
