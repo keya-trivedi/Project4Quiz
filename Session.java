@@ -1,9 +1,12 @@
+import java.util.Objects;
+
 public class Session {
     boolean loggedIn;
     Course currentCourse;
     User user;
+    int sessionNum;
 
-    public Session() {
+    public Session(int sessionNum) {
         loggedIn = false;
         currentCourse = null;
         user = null;
@@ -32,4 +35,13 @@ public class Session {
     public void setUser(User user) {
         this.user = user;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Session session = (Session) o;
+        return loggedIn == session.loggedIn && sessionNum == session.sessionNum && Objects.equals(currentCourse, session.currentCourse) && Objects.equals(user, session.user);
+    }
+
 }
