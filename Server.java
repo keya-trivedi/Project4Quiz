@@ -1,3 +1,4 @@
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -5,8 +6,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.zip.CheckedOutputStream;
 
 public class Server implements Runnable {
+    public static final int GET_COURSES_STR = -1;
     public static final int CREATE_STUDENT = 0;
     public static final int CREATE_TEACHER = 1;
     public static final int SIGN_IN = 2;
@@ -19,7 +22,13 @@ public class Server implements Runnable {
     public static final int DELETE_ACCOUNT = 9;
 
 
+
+
+
+
+
     private static ArrayList<User> users = User.readFromFile("Usersinfo.txt");
+    private static ArrayList<Course> courses = new ArrayList<>(); //fixme
     private static ArrayList<Session> sessions = new ArrayList<Session>();
     private static int sessionNum = 0;
 
@@ -164,6 +173,18 @@ public class Server implements Runnable {
                             e.printStackTrace();
                         }
                         break;
+
+                    case MAKE_COURSE:
+                        try {
+                            Course c = (Course) ois.readObject();
+                            courses.add(c);
+                            oos.writeObject("Success");
+
+                        } catch (ClassNotFoundException e){
+                            e.printStackTrace();
+                        }
+                        break;
+
                     case LOGOUT:
                         session.logout();
                         oos.writeObject("Success");
@@ -176,6 +197,26 @@ public class Server implements Runnable {
                         oos.writeObject("Success");
                         oos.flush();
                         break;
+                    case GET_COURSES_STR:
+                        if (courses.size() == 0) {
+                            oos.writeObject("There are no courses made");
+                            break;
+                        }
+                        oos.writeObject("Success");
+                        ArrayList<String> courseListStr = new ArrayList<>();
+                        for (int i = 0; i < courses.size(); i++) {
+                            courseListStr.add(String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber()));
+                        }
+                        oos.writeObject(courseListStr);
+                        break;
+                    case DELETE_COURSE:
+                        try {
+                            int index = (int) ois.readObject();
+                            courses.remove(index);
+                            oos.writeObject("Success");
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
 
                 }
 
