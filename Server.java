@@ -5,13 +5,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Server implements Runnable {
-    public static int CREATE_STUDENT = 0;
-    public static int CREATE_TEACHER = 1;
-    public static int SIGN_IN = 2;
-    public static int DELETE_USER = 3;
+    public static final int CREATE_STUDENT = 0;
+    public static final int CREATE_TEACHER = 1;
+    public static final int SIGN_IN = 2;
+    public static final int MAKE_COURSE = 3;
+    public static final int EDIT_COURSE = 4;
+    public static final int DELETE_COURSE = 5;
+    public static final int EDIT_USERNAME = 6;
+    public static final int EDIT_PASSWORD = 7;
+    public static final int LOGOUT = 8;
+    public static final int DELETE_ACCOUNT = 9;
+
 
     private static ArrayList<User> users = User.readFromFile("Usersinfo.txt");
     private static ArrayList<Session> sessions = new ArrayList<Session>();
@@ -56,7 +62,7 @@ public class Server implements Runnable {
                 boolean completed = true;
                 User proposedUser = null;
                 switch (path) {
-                    case 0: //create a student
+                    case CREATE_STUDENT: //create a student
 
                         try {
                             proposedUser = (User) ois.readObject();
@@ -84,7 +90,7 @@ public class Server implements Runnable {
                             session.setLoggedIn(true);
                         }
                         break;
-                    case 1:
+                    case CREATE_TEACHER:
                         try {
                             proposedUser = (User) ois.readObject();
                         } catch (IOException e) {
@@ -126,8 +132,50 @@ public class Server implements Runnable {
                         } else {
                             oos.writeObject("We could not find an account with that login info");
                         }
+                        oos.flush();
                         break;
-
+                    case EDIT_USERNAME:
+                        try {
+                            String newUsername = (String) ois.readObject();
+                            if (newUsername.contains(",")) {
+                                oos.writeObject("Usernames can not contain a comma");
+                            } else {
+                                session.getUser().setUsername(newUsername);
+                                Utils.reWriterUserFile(users,"UsersInfo.txt");
+                                oos.writeObject("Success");
+                            }
+                            oos.flush();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case EDIT_PASSWORD:
+                        try {
+                            String newPassword = (String) ois.readObject();
+                            if (newPassword.contains(",")) {
+                                oos.writeObject("Passwords can not contain a comma");
+                            } else {
+                                session.getUser().setPassword(newPassword);
+                                Utils.reWriterUserFile(users,"UsersInfo.txt");
+                                oos.writeObject("Success");
+                            }
+                            oos.flush();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case LOGOUT:
+                        session.logout();
+                        oos.writeObject("Success");
+                        oos.flush();
+                        break;
+                    case DELETE_ACCOUNT:
+                        users.remove(session.getUser());
+                        Utils.reWriterUserFile(users, "Usersinfo.txt");
+                        session.logout();
+                        oos.writeObject("Success");
+                        oos.flush();
+                        break;
 
                 }
 
