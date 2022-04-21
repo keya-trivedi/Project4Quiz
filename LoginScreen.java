@@ -1,13 +1,8 @@
-package com.example.testing;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class LoginScreen extends JFrame implements ActionListener {
@@ -30,20 +25,17 @@ public class LoginScreen extends JFrame implements ActionListener {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    LoginScreen(Socket socket) {
+    LoginScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
         addActionEvent();
         this.socket = socket;
 
-        try {
-            pw = new PrintWriter(socket.getOutputStream());
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        this.pw = pw;
+        this.oos = oos;
+        this.ois = ois;
+
     }
 
     public void setLayoutManager() {
@@ -87,12 +79,15 @@ public class LoginScreen extends JFrame implements ActionListener {
         if (e.getSource() == loginButton) {
             User user = new User(userTextField.getText(), passwordField.getText());
             try {
-                oos.writeObject(2);
+                oos.writeObject(Server.SIGN_IN);
                 oos.writeObject(user);
                 oos.flush();
                 String response = (String) ois.readObject();
                 if(response.equals("Success")) {
                     JOptionPane.showMessageDialog(this, "Success");
+                    this.dispose();
+                    TeacherBaseView newFrame = new TeacherBaseView(socket, pw, oos, ois);
+                    Utils.makeFrameFromTemplate(newFrame, "Home");
                 } else {
                     JOptionPane.showMessageDialog(this, response);
                 }
@@ -101,6 +96,7 @@ public class LoginScreen extends JFrame implements ActionListener {
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
             }
+
 
         }
         //Coding Part of RESET button
@@ -122,7 +118,7 @@ public class LoginScreen extends JFrame implements ActionListener {
         if (e.getSource() == signUpAsStudent) { //make a student
             User user = new User(userTextField.getText(), passwordField.getText());
             try {
-                oos.writeObject(0);
+                oos.writeObject(Server.CREATE_STUDENT);
                 oos.writeObject(user);
                 oos.flush();
                 String response = (String) ois.readObject();
@@ -141,7 +137,7 @@ public class LoginScreen extends JFrame implements ActionListener {
         if (e.getSource() == signUpButton) { //make a teacher
             User user = new User(userTextField.getText(), passwordField.getText());
             try {
-                oos.writeObject(1);
+                oos.writeObject(Server.CREATE_TEACHER);
                 oos.writeObject(user);
                 oos.flush();
                 String response = (String) ois.readObject();
