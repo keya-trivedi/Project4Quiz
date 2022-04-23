@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,8 +15,7 @@ public class Utils {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
     }
-
-
+    
     public static void reWriterUserFile(ArrayList<User> users, String fileName) { //do this when they delete their account, change username, password, or any other user attribute that is stored
         File f = new File(fileName);
         String descriptor;

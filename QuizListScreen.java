@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,15 +10,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ShowCoursesDropdownScreen extends JFrame implements ActionListener {
+public class QuizListScreen extends JFrame implements ActionListener {
 
     Container container = getContentPane();
-    JLabel questionLabel = new JLabel("What course do you want to choose");
+    JLabel questionLabel = new JLabel("What quiz do you want to choose");
 
 
     JComboBox<String> jComboBox;
 
-    JButton enterCourseButton = new JButton("Select");
+    JButton enterQuizButton = new JButton("Select");
 
     Socket socket;
     PrintWriter pw;
@@ -25,8 +26,9 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
     ObjectInputStream ois;
     int action;
     JFrame calledFrom;
-    public ShowCoursesDropdownScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> courses, int action, JFrame calledFrom) {
-        jComboBox = new JComboBox<>(courses.toArray(new String[courses.size()]));
+
+    public QuizListScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> quizes, int action, JFrame calledFrom) {
+        jComboBox = new JComboBox<>(quizes.toArray(new String[quizes.size()]));
 
         setLayoutManager();
         setLocationAndSize();
@@ -51,39 +53,39 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
 
         questionLabel.setBounds(50, 70, 350, 70);
 
-        enterCourseButton.setBounds(50, 240, 150, 30);
+        enterQuizButton.setBounds(50, 240, 150, 30);
     }
 
     public void addComponentsToContainer() {
         container.add(jComboBox);
-        container.add(enterCourseButton);
+        container.add(enterQuizButton);
         container.add(questionLabel);
     }
 
     public void addActionEvent() {
-        enterCourseButton.addActionListener(this);
+        enterQuizButton.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (e.getSource() == enterCourseButton) {
+            if (e.getSource() == enterQuizButton) {
                 //get course edit options
                 switch (action) {
-                    case Server.DELETE_COURSE:
-                        System.out.println("We here");
+                    case Server.DELETE_QUIZ:
                         oos.writeObject(action);
                         oos.writeObject(jComboBox.getSelectedIndex());
                         JOptionPane.showMessageDialog(this, ois.readObject());
                         this.dispose();
                         calledFrom.setVisible(true);
                         break;
-                    case Server.EDIT_COURSE:
-                        this.dispose();
-                        oos.writeObject(Server.SET_CURRENT_COURSE);
+                    case Server.EDIT_QUIZ:
+                        oos.writeObject(Server.SET_CURRENT_QUIZ);
                         oos.writeObject(jComboBox.getSelectedIndex());
-                        CourseEditsOptionScreen currentScreen = new CourseEditsOptionScreen(socket, pw, oos, ois);
+                        this.dispose();
+                        QuizEditOptions currentScreen = new QuizEditOptions(socket, pw, oos, ois, false);
                         Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
+                        break;
                 }
             }
         } catch (IOException ex) {

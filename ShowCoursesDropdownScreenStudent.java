@@ -9,10 +9,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ShowCoursesDropdownScreen extends JFrame implements ActionListener {
+public class ShowCoursesDropdownScreenStudent extends JFrame implements ActionListener {
 
     Container container = getContentPane();
-    JLabel questionLabel = new JLabel("What course do you want to choose");
+    JLabel questionLabel = new JLabel("What course do you want to enter");
 
 
     JComboBox<String> jComboBox;
@@ -25,7 +25,8 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
     ObjectInputStream ois;
     int action;
     JFrame calledFrom;
-    public ShowCoursesDropdownScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> courses, int action, JFrame calledFrom) {
+
+    public ShowCoursesDropdownScreenStudent(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> courses, int action, JFrame calledFrom) {
         jComboBox = new JComboBox<>(courses.toArray(new String[courses.size()]));
 
         setLayoutManager();
@@ -52,6 +53,7 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
         questionLabel.setBounds(50, 70, 350, 70);
 
         enterCourseButton.setBounds(50, 240, 150, 30);
+
     }
 
     public void addComponentsToContainer() {
@@ -71,7 +73,6 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
                 //get course edit options
                 switch (action) {
                     case Server.DELETE_COURSE:
-                        System.out.println("We here");
                         oos.writeObject(action);
                         oos.writeObject(jComboBox.getSelectedIndex());
                         JOptionPane.showMessageDialog(this, ois.readObject());
@@ -80,10 +81,9 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
                         break;
                     case Server.EDIT_COURSE:
                         this.dispose();
-                        oos.writeObject(Server.SET_CURRENT_COURSE);
-                        oos.writeObject(jComboBox.getSelectedIndex());
                         CourseEditsOptionScreen currentScreen = new CourseEditsOptionScreen(socket, pw, oos, ois);
                         Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
+                        break;
                 }
             }
         } catch (IOException ex) {

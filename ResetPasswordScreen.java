@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,13 +19,15 @@ public class ResetPasswordScreen extends JFrame implements ActionListener {
     PrintWriter pw;
     ObjectOutputStream oos;
     ObjectInputStream ois;
+    JFrame calledFrom;
 
-    ResetPasswordScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public ResetPasswordScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, JFrame calledFrom) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
         addActionEvent();
         this.socket = socket;
+        this.calledFrom = calledFrom;
 
         this.pw = pw;
         this.oos = oos;
@@ -66,8 +69,7 @@ public class ResetPasswordScreen extends JFrame implements ActionListener {
                 if(response.equals("Success")) {
                     JOptionPane.showMessageDialog(this, "Success");
                     this.dispose();
-                    TeacherBaseView newFrame = new TeacherBaseView(socket, pw, oos, ois);
-                    Utils.makeFrameFromTemplate(newFrame, "Home");
+                    calledFrom.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(this, response);
                 }

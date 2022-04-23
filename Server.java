@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.zip.CheckedOutputStream;
+
 
 public class Server implements Runnable {
+    public static final int GET_QUESTIONS_STR = -5;
+    public static final int SET_CURRENT_QUIZ = -4;
+    public static final int SET_CURRENT_COURSE = -3;
+    public static final int GET_QUIZZES_STR = -2;
     public static final int GET_COURSES_STR = -1;
     public static final int CREATE_STUDENT = 0;
     public static final int CREATE_TEACHER = 1;
@@ -20,15 +24,20 @@ public class Server implements Runnable {
     public static final int EDIT_PASSWORD = 7;
     public static final int LOGOUT = 8;
     public static final int DELETE_ACCOUNT = 9;
-
-
-
-
-
+    public static final int CREATE_MC_QUESTION = 10;
+    public static final int CREATE_TF_QUESTION = 11;
+    public static final int CREATE_FB_QUESTION = 12;
+    public static final int CREATE_QUIZ = 13;
+    public static final int DELETE_QUIZ = 14;
+    public static final int EDIT_QUIZ = 15;
+    public static final int DELETE_QUESTION = 16;
+    public static final int EDIT_QUESTION = 17;
 
 
     private static ArrayList<User> users = User.readFromFile("Usersinfo.txt");
-    private static ArrayList<Course> courses = new ArrayList<>(); //fixme
+    //private static ArrayList<Course> courses = new ArrayList<>(); //fixme
+    private static ArrayList<Course> courses = StoreData.readCourses(); //fixme
+
     private static ArrayList<Session> sessions = new ArrayList<Session>();
     private static int sessionNum = 0;
 
@@ -63,32 +72,21 @@ public class Server implements Runnable {
                 // read from input, and echo output...
 
                 int path = 0;
-                try {
-                    path = (Integer) ois.readObject();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                path = (Integer) ois.readObject();
+
                 boolean completed = true;
                 User proposedUser = null;
+
                 switch (path) {
                     case CREATE_STUDENT: //create a student
-
-                        try {
-                            proposedUser = (User) ois.readObject();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        proposedUser = (User) ois.readObject();
 
                         for (User u : users) {
                             if (u.getUsername().equals(proposedUser.getUsername())) {
-                                System.out.println("We lit");
                                 oos.writeObject("Try another username, it is already taken");
                                 oos.flush();
                                 completed = false;
                                 break;
-
                             }
                         }
                         if (completed) {
@@ -98,19 +96,13 @@ public class Server implements Runnable {
                             users.add(session.getUser()); //FIXME make student
                             session.setLoggedIn(true);
                         }
+                        Utils.reWriterUserFile(users,"UsersInfo.txt");
                         break;
                     case CREATE_TEACHER:
-                        try {
-                            proposedUser = (User) ois.readObject();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        proposedUser = (User) ois.readObject();
 
                         for (User u : users) {
                             if (u.getUsername().equals(proposedUser.getUsername())) {
-                                System.out.println("We lit");
                                 oos.writeObject("Try another username, it is already taken");
                                 oos.flush();
                                 completed = false;
@@ -125,18 +117,18 @@ public class Server implements Runnable {
                             users.add(session.getUser()); //FIXME make student
                             session.setLoggedIn(true);
                         }
+                        Utils.reWriterUserFile(users,"UsersInfo.txt");
                         break;
-                    case 2:
-                        try {
-                            proposedUser = (User) ois.readObject();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                    case SIGN_IN:
+
+                        proposedUser = (User) ois.readObject();
+
                         if (users.contains(proposedUser)) {
-                            oos.writeObject("Success");
-                            session.setLoggedIn(true);
+                            if (users.get(users.indexOf(proposedUser)) instanceof Student) {
+                                oos.writeObject("S");
+                            } else {
+                                oos.writeObject("T");
+                            }                            session.setLoggedIn(true);
                             session.setUser(users.get(users.indexOf(proposedUser)));
                         } else {
                             oos.writeObject("We could not find an account with that login info");
@@ -144,45 +136,39 @@ public class Server implements Runnable {
                         oos.flush();
                         break;
                     case EDIT_USERNAME:
-                        try {
-                            String newUsername = (String) ois.readObject();
-                            if (newUsername.contains(",")) {
-                                oos.writeObject("Usernames can not contain a comma");
-                            } else {
-                                session.getUser().setUsername(newUsername);
-                                Utils.reWriterUserFile(users,"UsersInfo.txt");
-                                oos.writeObject("Success");
-                            }
-                            oos.flush();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+
+                        String newUsername = (String) ois.readObject();
+                        if (newUsername.contains(",")) {
+                            oos.writeObject("Usernames can not contain a comma");
+                        } else {
+                            session.getUser().setUsername(newUsername);
+                            Utils.reWriterUserFile(users,"UsersInfo.txt");
+                            oos.writeObject("Success");
                         }
+                        oos.flush();
+
+                        Utils.reWriterUserFile(users,"UsersInfo.txt");
                         break;
                     case EDIT_PASSWORD:
-                        try {
-                            String newPassword = (String) ois.readObject();
-                            if (newPassword.contains(",")) {
-                                oos.writeObject("Passwords can not contain a comma");
-                            } else {
-                                session.getUser().setPassword(newPassword);
-                                Utils.reWriterUserFile(users,"UsersInfo.txt");
-                                oos.writeObject("Success");
-                            }
-                            oos.flush();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-
-                    case MAKE_COURSE:
-                        try {
-                            Course c = (Course) ois.readObject();
-                            courses.add(c);
+                        String newPassword = (String) ois.readObject();
+                        if (newPassword.contains(",")) {
+                            oos.writeObject("Passwords can not contain a comma");
+                        } else {
+                            session.getUser().setPassword(newPassword);
+                            Utils.reWriterUserFile(users,"UsersInfo.txt");
                             oos.writeObject("Success");
-
-                        } catch (ClassNotFoundException e){
-                            e.printStackTrace();
                         }
+                        oos.flush();
+
+                        Utils.reWriterUserFile(users,"UsersInfo.txt");
+                        break;
+                    case MAKE_COURSE:
+
+                        Course c = (Course) ois.readObject();
+                        courses.add(c);
+                        oos.writeObject("Success");
+
+                        StoreData.storeCourseData(courses);
                         break;
 
                     case LOGOUT:
@@ -208,19 +194,103 @@ public class Server implements Runnable {
                             courseListStr.add(String.format("%d.%s %s%n", i + 1, courses.get(i).getCourseName(), courses.get(i).getCourseNumber()));
                         }
                         oos.writeObject(courseListStr);
+                        oos.flush();
                         break;
-                    case DELETE_COURSE:
-                        try {
-                            int index = (int) ois.readObject();
-                            courses.remove(index);
-                            oos.writeObject("Success");
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                    case GET_QUIZZES_STR:
+                        if (session.getCurrentCourse().getQuizzes().size() == 0) {
+                            oos.writeObject("There are no quizzes made");
+                            break;
                         }
+                        oos.writeObject("Success");
+                        ArrayList<String> quizListStr = new ArrayList<>();
+
+                        for (int i = 1; i <= session.getCurrentCourse().getQuizzes().size(); i++) {
+                            quizListStr.add(String.format("%d.%s%n", i, session.getCurrentCourse().getQuiz(i - 1).getQuizName()));
+                        }
+                        oos.writeObject(quizListStr);
+                        oos.flush();
+                        break;
+                    case GET_QUESTIONS_STR:
+                        if (session.getCurrentQuiz().getQuestionCount() == 0) {
+                            oos.writeObject("There are no questions made");
+                            break;
+                        }
+                        oos.writeObject("Success");
+                        ArrayList<String> questionListStr = new ArrayList<>();
+
+                        for (int i = 1; i <= session.getCurrentQuiz().getQuestionCount(); i++) {
+                            questionListStr.add(String.format("%d.%s%n", i, session.getCurrentQuiz().getQuestions().get(i - 1).getQuestion()));
+                        }
+                        oos.writeObject(questionListStr);
+                        oos.flush();
+                        break;
+
+                    case DELETE_COURSE:
+                        int index = (int) ois.readObject();
+                        System.out.println("Remove " + index);
+                        courses.remove(index);
+                        oos.writeObject("Success");
+
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case CREATE_MC_QUESTION:
+                        Question q = null;
+                        q = (MCquestion) ois.readObject();
+
+                        session.getCurrentQuiz().addQuestion(q);
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case CREATE_TF_QUESTION:
+                        Question tfQ = null;
+
+                        tfQ = (TFquestion) ois.readObject();
+
+                        session.getCurrentQuiz().addQuestion(tfQ);
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case CREATE_FB_QUESTION:
+                        Question fbQ = null;
+                        fbQ = (FillBlankQuestion) ois.readObject();
+
+                        session.getCurrentQuiz().addQuestion(fbQ);
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case CREATE_QUIZ:
+                        Quiz quiz = null;
+
+                        quiz = (Quiz) ois.readObject();
+
+                        session.setCurrentQuiz(quiz);
+                        session.getCurrentCourse().addQuiz(quiz);
+                        oos.writeObject("Success");
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case DELETE_QUIZ:
+                        int delIndex = (Integer) ois.readObject();
+                        session.getCurrentCourse().removeQuiz(delIndex); //subtract 1 since you start at 1 instead of 0
+                        session.setCurrentQuiz(null);
+                        oos.writeObject("Success");
+                        oos.flush();
+                        StoreData.storeCourseData(courses);
+                        break;
+                    case SET_CURRENT_COURSE:
+                        session.setCurrentCourse(courses.get((Integer) ois.readObject()));
+                        break;
+                    case SET_CURRENT_QUIZ:
+                        session.setCurrentQuiz(session.getCurrentCourse().getQuiz((Integer) ois.readObject()));
+                        break;
+                    case EDIT_QUIZ:
+                        break;
+                    case DELETE_QUESTION:
+                        session.getCurrentQuiz().deleteQuestion((Integer) ois.readObject());
+                        StoreData.storeCourseData(courses);
+                        break;
 
                 }
 
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

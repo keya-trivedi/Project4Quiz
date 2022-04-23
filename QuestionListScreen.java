@@ -1,3 +1,5 @@
+package com.example.testing;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,15 +11,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ShowCoursesDropdownScreen extends JFrame implements ActionListener {
+public class QuestionListScreen extends JFrame implements ActionListener {
 
     Container container = getContentPane();
-    JLabel questionLabel = new JLabel("What course do you want to choose");
+    JLabel questionLabel = new JLabel("What question do you want to choose");
 
 
     JComboBox<String> jComboBox;
 
-    JButton enterCourseButton = new JButton("Select");
+    JButton enterQuestionButton = new JButton("Select");
 
     Socket socket;
     PrintWriter pw;
@@ -25,8 +27,9 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
     ObjectInputStream ois;
     int action;
     JFrame calledFrom;
-    public ShowCoursesDropdownScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> courses, int action, JFrame calledFrom) {
-        jComboBox = new JComboBox<>(courses.toArray(new String[courses.size()]));
+
+    public QuestionListScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, ArrayList<String> questions, int action, JFrame calledFrom) {
+        jComboBox = new JComboBox<>(questions.toArray(new String[questions.size()]));
 
         setLayoutManager();
         setLocationAndSize();
@@ -51,44 +54,43 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
 
         questionLabel.setBounds(50, 70, 350, 70);
 
-        enterCourseButton.setBounds(50, 240, 150, 30);
+        enterQuestionButton.setBounds(50, 240, 150, 30);
     }
 
     public void addComponentsToContainer() {
         container.add(jComboBox);
-        container.add(enterCourseButton);
+        container.add(enterQuestionButton);
         container.add(questionLabel);
     }
 
     public void addActionEvent() {
-        enterCourseButton.addActionListener(this);
+        enterQuestionButton.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (e.getSource() == enterCourseButton) {
+            if (e.getSource() == enterQuestionButton) {
                 //get course edit options
                 switch (action) {
-                    case Server.DELETE_COURSE:
-                        System.out.println("We here");
+                    case Server.DELETE_QUESTION:
                         oos.writeObject(action);
                         oos.writeObject(jComboBox.getSelectedIndex());
-                        JOptionPane.showMessageDialog(this, ois.readObject());
                         this.dispose();
-                        calledFrom.setVisible(true);
+                        TeacherBaseView currentSreen = new TeacherBaseView(socket, pw, oos, ois);
+                        Utils.makeFrameFromTemplate(currentSreen, "Home");
+                        //calledFrom.setVisible(true);
                         break;
-                    case Server.EDIT_COURSE:
-                        this.dispose();
-                        oos.writeObject(Server.SET_CURRENT_COURSE);
+                    case Server.EDIT_QUIZ:
+                        oos.writeObject(Server.SET_CURRENT_QUIZ);
                         oos.writeObject(jComboBox.getSelectedIndex());
-                        CourseEditsOptionScreen currentScreen = new CourseEditsOptionScreen(socket, pw, oos, ois);
-                        Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
+                        this.dispose();
+                        QuizEditOptions currentScreen = new QuizEditOptions(socket, pw, oos, ois, false);
+                        Utils.makeFrameFromTemplate(currentScreen, "Quiz edit options");
+                        break;
                 }
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }

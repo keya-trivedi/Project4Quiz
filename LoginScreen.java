@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -70,20 +71,68 @@ public class LoginScreen extends JFrame implements ActionListener {
         loginButton.addActionListener(this);
         resetButton.addActionListener(this);
         signUpButton.addActionListener(this);
+        signUpAsStudent.addActionListener(this);
         showPassword.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         //Coding Part of LOGIN button
-        if (e.getSource() == loginButton) {
-            User user = new User(userTextField.getText(), passwordField.getText());
-            try {
+        try {
+            if (e.getSource() == loginButton) {
+                User user = new User(userTextField.getText(), passwordField.getText());
                 oos.writeObject(Server.SIGN_IN);
                 oos.writeObject(user);
                 oos.flush();
                 String response = (String) ois.readObject();
-                if(response.equals("Success")) {
+                if (response.equals("T")) {
+                    JOptionPane.showMessageDialog(this, "Success");
+                    this.dispose();
+                    TeacherBaseView newFrame = new TeacherBaseView(socket, pw, oos, ois);
+                    Utils.makeFrameFromTemplate(newFrame, "Home");
+                } else if (response.equals("S")) {
+                    JOptionPane.showMessageDialog(this, "Success");
+                    this.dispose();
+                    StudentBaseView newFrame = new StudentBaseView(socket, pw, oos, ois);
+                    Utils.makeFrameFromTemplate(newFrame, "Home");
+                } else {
+                    JOptionPane.showMessageDialog(this, response);
+                }
+            }
+            //Coding Part of RESET button
+            if (e.getSource() == resetButton) {
+                userTextField.setText("");
+                passwordField.setText("");
+            }
+            //Coding Part of showPassword JCheckBox
+            if (e.getSource() == showPassword) {
+                if (showPassword.isSelected()) {
+                    passwordField.setEchoChar((char) 0);
+                } else {
+                    passwordField.setEchoChar('*');
+                }
+            } else if (e.getSource() == signUpAsStudent) { //make a student
+                User user = new User(userTextField.getText(), passwordField.getText());
+                oos.writeObject(Server.CREATE_STUDENT);
+                oos.writeObject(user);
+                oos.flush();
+                String response = (String) ois.readObject();
+                if (response.equals("Success")) {
+                    JOptionPane.showMessageDialog(this, "Success");
+                    this.dispose();
+                    StudentBaseView newFrame = new StudentBaseView(socket, pw, oos, ois);
+                    Utils.makeFrameFromTemplate(newFrame, "Home");
+                } else {
+                    JOptionPane.showMessageDialog(this, response);
+                }
+
+            } else if (e.getSource() == signUpButton) { //make a teacher
+                User user = new User(userTextField.getText(), passwordField.getText());
+                oos.writeObject(Server.CREATE_TEACHER);
+                oos.writeObject(user);
+                oos.flush();
+                String response = (String) ois.readObject();
+                if (response.equals("Success")) {
                     JOptionPane.showMessageDialog(this, "Success");
                     this.dispose();
                     TeacherBaseView newFrame = new TeacherBaseView(socket, pw, oos, ois);
@@ -91,69 +140,12 @@ public class LoginScreen extends JFrame implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(this, response);
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
             }
-
-
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
         }
-        //Coding Part of RESET button
-        if (e.getSource() == resetButton) {
-            userTextField.setText("");
-            passwordField.setText("");
-        }
-        //Coding Part of showPassword JCheckBox
-        if (e.getSource() == showPassword) {
-            if (showPassword.isSelected()) {
-                passwordField.setEchoChar((char) 0);
-            } else {
-                passwordField.setEchoChar('*');
-            }
-
-
-        }
-
-        if (e.getSource() == signUpAsStudent) { //make a student
-            User user = new User(userTextField.getText(), passwordField.getText());
-            try {
-                oos.writeObject(Server.CREATE_STUDENT);
-                oos.writeObject(user);
-                oos.flush();
-                String response = (String) ois.readObject();
-                if(response.equals("Success")) {
-                    JOptionPane.showMessageDialog(this, "Success");
-                } else {
-                    JOptionPane.showMessageDialog(this, response);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (e.getSource() == signUpButton) { //make a teacher
-            User user = new User(userTextField.getText(), passwordField.getText());
-            try {
-                oos.writeObject(Server.CREATE_TEACHER);
-                oos.writeObject(user);
-                oos.flush();
-                String response = (String) ois.readObject();
-                if(response.equals("Success")) {
-                    JOptionPane.showMessageDialog(this, "Success");
-                } else {
-                    JOptionPane.showMessageDialog(this, response);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-
     }
 
 }

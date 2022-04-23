@@ -1,10 +1,13 @@
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class TFquestion extends Question {
+public class TFquestion extends Question implements Serializable {
     private boolean answer;
 
-    public TFquestion(String question, boolean answer) {
+    TFquestion(String question, boolean answer) {
         this.answer = answer;
         this.question = question;
     }

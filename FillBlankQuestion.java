@@ -1,6 +1,10 @@
+
+import java.io.Serializable;
+import java.util.InputMismatchException;
+import java.util.Objects;
 import java.util.Scanner;
 
-public class FillBlankQuestion extends Question{
+public class FillBlankQuestion extends Question implements Serializable {
     private String answer;
 
     public FillBlankQuestion(String question, String answer) {
