@@ -1,12 +1,12 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-public class User {
+import java.io.*;
+import java.util.ArrayList;
+
+public class User implements Serializable{
     protected String username;
     protected String password;
 
-    public User(String username, String password) {
+    User(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -50,6 +50,32 @@ public class User {
             e.printStackTrace();
         }
 
+    }
+
+    public static final ArrayList<User> readFromFile(String filename) {
+        ArrayList<User> users = new ArrayList<User>();
+        String line;
+        try {
+            File f = new File(filename);
+            FileReader fr = new FileReader(f);
+            BufferedReader br = new BufferedReader(fr);
+            line = br.readLine();
+            while (line != null) {
+                String[] attributes = line.split(",");
+
+                if (attributes[2].equals("Teacher")) {
+                    users.add(new Teacher(attributes[0], attributes[1]));
+                } else if (attributes[2].equals("Student")) {
+                    users.add(new Student(attributes[0], attributes[1]));
+                }
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
 

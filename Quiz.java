@@ -1,11 +1,8 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Quiz {
+public class Quiz implements Serializable {
     private String quizName;
     private ArrayList<Question> questions;
     private ArrayList<QuizSubmission> submissions;

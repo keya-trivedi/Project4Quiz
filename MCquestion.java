@@ -1,7 +1,11 @@
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.InputMismatchException;
+import java.util.Objects;
 import java.util.Scanner;
 
-public class MCquestion extends Question {
+public class MCquestion extends Question implements Serializable {
     private String choiceA;
     private String choiceB;
     private String choiceC;
@@ -108,5 +112,4 @@ public class MCquestion extends Question {
 
         return new AnsweredQuestion(this, ans, check(num));
     }
-
 }

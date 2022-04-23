@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Course {
+public class Course implements Serializable {
     private ArrayList<Quiz> quizzes;
     private String courseName;
     private int courseNumber;
@@ -70,5 +71,5 @@ public class Course {
     public int getQuizCount() {
         return quizzes.size();
     }
-    
+
 }
