@@ -19,16 +19,18 @@ public class ChooseQuestionTypeScreen extends JFrame implements ActionListener {
     PrintWriter pw;
     ObjectOutputStream oos;
     ObjectInputStream ois;
-    boolean showFinishButton;
+    private boolean showFinishButton;
 
-    ChooseQuestionTypeScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, boolean showFinishButton) {
+    public ChooseQuestionTypeScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, boolean showFinishButton) {
+        this.showFinishButton = showFinishButton;
+
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
         addActionEvent();
         this.socket = socket;
 
-        this.showFinishButton = showFinishButton;
+
         this.pw = pw;
         this.oos = oos;
         this.ois = ois;
@@ -39,10 +41,11 @@ public class ChooseQuestionTypeScreen extends JFrame implements ActionListener {
     }
 
     public void setLocationAndSize() {
-        prompt.setBounds(100, 150, 500, 30);
+        prompt.setBounds(50, 150, 500, 30);
         multChoiceButton.setBounds(100,220,150,30);
         trueFalseButton.setBounds(100,290,150,30);
         fillBlankButton.setBounds(100,360,150,30);
+
         if (showFinishButton) {
             finishButton.setBounds(100, 420, 150, 30);
         }
@@ -53,7 +56,8 @@ public class ChooseQuestionTypeScreen extends JFrame implements ActionListener {
         container.add(multChoiceButton);
         container.add(fillBlankButton);
         container.add(trueFalseButton);
-        if(showFinishButton) {
+
+        if (showFinishButton) {
             container.add(finishButton);
         }
 
@@ -74,12 +78,20 @@ public class ChooseQuestionTypeScreen extends JFrame implements ActionListener {
             CreateMCquestionScreen currentScreen = new CreateMCquestionScreen(socket, pw, oos, ois);
             Utils.makeFrameFromTemplate(currentScreen,"Create Multiple Choice Question");
         } else if (e.getSource() == trueFalseButton) {
-
+            this.dispose();
+            CreateTFquestionScreen currentScreen = new CreateTFquestionScreen(socket, pw, oos, ois);
+            Utils.makeFrameFromTemplate(currentScreen, "Create True/False Question");
         } else if (e.getSource() == fillBlankButton) {
-
+            this.dispose();
+            CreateFBquestionScreen currentScreen = new CreateFBquestionScreen(socket, pw, oos, ois);
+            Utils.makeFrameFromTemplate(currentScreen, "Create a fill in the blank Question");
         } else if (e.getSource() == finishButton) {
-
+            this.dispose();
+            TeacherBaseView currentScreen = new TeacherBaseView(socket, pw, oos, ois);
+            Utils.makeFrameFromTemplate(currentScreen, "Home");
         }
     }
 
 }
+
+

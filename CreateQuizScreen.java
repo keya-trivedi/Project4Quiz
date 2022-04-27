@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +19,7 @@ public class CreateQuizScreen extends JFrame implements ActionListener {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    CreateQuizScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public CreateQuizScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();

@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class CreateMCquestionScreen extends JFrame implements ActionListener {
+public class TakeMCquestion extends JFrame implements ActionListener {
 
     Container container = getContentPane();
     JLabel questionLabel = new JLabel("Question");
@@ -19,10 +20,10 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
     JLabel answerLabel = new JLabel("Answer");
 
 
-    JTextField choiceAfield = new JTextField();
-    JTextField choiceBfield = new JTextField();
-    JTextField choiceCfield = new JTextField();
-    JTextField choiceDfield = new JTextField();
+    JLabel choiceAfield;
+    JLabel choiceBfield;
+    JLabel choiceCfield;
+    JLabel choiceDfield;
 
     JTextField questionField = new JTextField();
 
@@ -30,14 +31,14 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
 
     JComboBox<String> jComboBox = new JComboBox<>(optionsToChoose);
 
-    JButton makeQuestionButton = new JButton("Create MC question");
+    JButton answerQuestionButton = new JButton("Answer question");
 
     Socket socket;
     PrintWriter pw;
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    public CreateMCquestionScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public TakeMCquestion(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, MCquestion question) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
@@ -48,6 +49,12 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
         this.pw = pw;
         this.oos = oos;
         this.ois = ois;
+
+        this.choiceAfield = new JLabel(question.getChoiceA());
+        this.choiceBfield = new JLabel(question.getChoiceB());
+        this.choiceCfield = new JLabel(question.getChoiceC());
+        this.choiceDfield = new JLabel(question.getChoiceD());
+
     }
 
     public void setLayoutManager() {
@@ -72,7 +79,7 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
         questionField.setBounds(150, 70, 100, 30);
 
 
-        makeQuestionButton.setBounds(150, 460, 150, 30);
+        answerQuestionButton.setBounds(150, 460, 150, 30);
     }
 
     public void addComponentsToContainer() {
@@ -89,19 +96,19 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
         container.add(jComboBox);
         container.add(answerLabel);
 
-        container.add(makeQuestionButton);
+        container.add(answerQuestionButton);
         container.add(questionField);
         container.add(questionLabel);
     }
 
     public void addActionEvent() {
-        makeQuestionButton.addActionListener(this);
+        answerQuestionButton.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-            //do something to connect to control flow
-        if (e.getSource() == makeQuestionButton) {
+        //do something to connect to control flow
+        if (e.getSource() == answerQuestionButton) {
             MCquestion q = new MCquestion(questionField.getText(),choiceAfield.getText(), choiceBfield.getText(), choiceCfield.getText(), choiceDfield.getText(), jComboBox.getSelectedIndex() + 1);
             try {
                 oos.writeObject(Server.CREATE_MC_QUESTION);
@@ -117,3 +124,7 @@ public class CreateMCquestionScreen extends JFrame implements ActionListener {
 
     }
 }
+
+
+
+

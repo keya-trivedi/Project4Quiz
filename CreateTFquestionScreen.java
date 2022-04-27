@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,7 +28,7 @@ public class CreateTFquestionScreen extends JFrame implements ActionListener {
     ObjectInputStream ois;
 
 
-    CreateTFquestionScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public CreateTFquestionScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
@@ -95,7 +94,3 @@ public class CreateTFquestionScreen extends JFrame implements ActionListener {
         }
     }
 }
-
-
-
-

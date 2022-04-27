@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,7 +21,7 @@ public class CreateCourseScreen extends JFrame implements ActionListener {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    CreateCourseScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public CreateCourseScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();

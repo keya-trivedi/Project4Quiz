@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -86,6 +85,11 @@ public class QuizListScreen extends JFrame implements ActionListener {
                         QuizEditOptions currentScreen = new QuizEditOptions(socket, pw, oos, ois, false);
                         Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
                         break;
+                    case Server.TAKE_QUIZ:
+                        Quiz quiz = (Quiz) ois.readObject();
+                        ArrayList<Question> questions = quiz.getQuestions();
+                        break;
+
                 }
             }
         } catch (IOException ex) {

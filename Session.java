@@ -62,3 +62,4 @@ public class Session {
         return loggedIn == session.loggedIn && sessionNum == session.sessionNum && Objects.equals(currentCourse, session.currentCourse) && Objects.equals(user, session.user);
     }
 
+}

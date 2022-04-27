@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,7 +25,7 @@ public class LoginScreen extends JFrame implements ActionListener {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    LoginScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public LoginScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();

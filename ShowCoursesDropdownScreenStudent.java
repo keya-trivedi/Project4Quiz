@@ -71,20 +71,18 @@ public class ShowCoursesDropdownScreenStudent extends JFrame implements ActionLi
         try {
             if (e.getSource() == enterCourseButton) {
                 //get course edit options
-                switch (action) {
-                    case Server.DELETE_COURSE:
-                        oos.writeObject(action);
-                        oos.writeObject(jComboBox.getSelectedIndex());
-                        JOptionPane.showMessageDialog(this, ois.readObject());
-                        this.dispose();
-                        calledFrom.setVisible(true);
-                        break;
-                    case Server.EDIT_COURSE:
-                        this.dispose();
-                        CourseEditsOptionScreen currentScreen = new CourseEditsOptionScreen(socket, pw, oos, ois);
-                        Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
-                        break;
+                oos.writeObject(Server.GET_COURSES_STR);
+                String response = null;
+                response = (String) ois.readObject();
+                if (response.equals("Success")) {
+                    ArrayList<String> arr = (ArrayList<String>) ois.readObject();
+                    this.dispose();
+                    ShowCoursesDropdownScreen currentScreen = new ShowCoursesDropdownScreen(socket, pw, oos, ois, arr, Server.EDIT_COURSE, this);
+                    Utils.makeFrameFromTemplate(currentScreen, "Courses");
+                } else {
+                    JOptionPane.showMessageDialog(this, response);
                 }
+
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -93,7 +91,3 @@ public class ShowCoursesDropdownScreenStudent extends JFrame implements ActionLi
         }
     }
 }
-
-
-
-

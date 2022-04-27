@@ -1,5 +1,3 @@
-package com.example.testing;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -95,7 +93,3 @@ public class QuestionListScreen extends JFrame implements ActionListener {
         }
     }
 }
-
-
-
-

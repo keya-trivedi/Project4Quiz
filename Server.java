@@ -1,4 +1,3 @@
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.net.Socket;
 
 
 public class Server implements Runnable {
+    public static final int TAKE_QUIZ = -8;
+    public static final int ENTER_COURSE = -7;
     public static final int GET_QUESTIONS_STR = -5;
     public static final int SET_CURRENT_QUIZ = -4;
     public static final int SET_CURRENT_COURSE = -3;
@@ -72,7 +73,11 @@ public class Server implements Runnable {
                 // read from input, and echo output...
 
                 int path = 0;
-                path = (Integer) ois.readObject();
+                try {
+                    path = (Integer) ois.readObject();
+                } catch (java.net.SocketException e) {
+                    break;
+                }
 
                 boolean completed = true;
                 User proposedUser = null;
@@ -285,6 +290,9 @@ public class Server implements Runnable {
                         session.getCurrentQuiz().deleteQuestion((Integer) ois.readObject());
                         StoreData.storeCourseData(courses);
                         break;
+                    case TAKE_QUIZ:
+                        oos.writeObject(session.getCurrentQuiz().getQuestions());
+                        break;
 
                 }
 
@@ -323,4 +331,3 @@ public class Server implements Runnable {
 
         }
 }
-

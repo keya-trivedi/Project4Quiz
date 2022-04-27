@@ -21,7 +21,7 @@ public class ResetUsernameScreen extends JFrame implements ActionListener {
 
     JFrame calledFrom;
 
-    ResetUsernameScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, JFrame calledFrom) {
+    public ResetUsernameScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois, JFrame calledFrom) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();

@@ -6,16 +6,12 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class CourseEditsOptionScreen extends JFrame implements ActionListener {
+public class StudentInCourseOptions extends JFrame implements ActionListener {
 
     Container container = getContentPane();
-    public static String LOGGED_IN_TEACHER_OPTIONS ="1.Make a quiz\n2.Edit a quiz\n3.Delete quiz\n4.View quiz submissions\n5.Edit username\n6.Edit password\n7.Logout\n8.Delete Account";
 
     JLabel prompt = new JLabel("WHAT DO YOU WANT TO DO?");
-    JButton makeQuizButton = new JButton("MAKE A QUIZ");
-    JButton editQuizButton = new JButton("EDIT A QUIZ");
-    JButton deleteQuizButton = new JButton("DELETE A QUIZ");
-    JButton submissionsButton = new JButton("VIEW QUIZ SUBMISSIONS");
+    JButton takeQuizButton = new JButton("TAKE A QUIZ");
     JButton logoutButton = new JButton("LOGOUT ");
     JButton resetPassButton = new JButton("RESET PASSWORD");
     JButton resetNameButton = new JButton("RESET USERNAME");
@@ -27,7 +23,7 @@ public class CourseEditsOptionScreen extends JFrame implements ActionListener {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    public CourseEditsOptionScreen(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
+    public StudentInCourseOptions(Socket socket, PrintWriter pw, ObjectOutputStream oos, ObjectInputStream ois) {
         setLayoutManager();
         setLocationAndSize();
         addComponentsToContainer();
@@ -45,38 +41,29 @@ public class CourseEditsOptionScreen extends JFrame implements ActionListener {
 
     public void setLocationAndSize() {
         prompt.setBounds(100, 150, 250, 30);
-        makeQuizButton.setBounds(25, 220, 150, 30);
-        editQuizButton.setBounds(175, 220, 150, 30);
-        deleteQuizButton.setBounds(25, 290, 150, 30);
-        submissionsButton.setBounds(175,290,150,30);
-        resetNameButton.setBounds(25, 360, 150, 30);
-        resetPassButton.setBounds(175, 360, 150, 30);
-        logoutButton.setBounds(25, 430, 150, 30);
-        delAccountButton.setBounds(175, 430, 175, 30);
+        takeQuizButton.setBounds(25, 220, 150, 30);
+        resetNameButton.setBounds(175, 220, 150, 30);
+        resetPassButton.setBounds(25, 290, 150, 30);
+        logoutButton.setBounds(175,290,150,30);
+        delAccountButton.setBounds(25, 360, 150, 30);
 
     }
 
     public void addComponentsToContainer() {
         container.add(prompt);
-        container.add(makeQuizButton);
-        container.add(editQuizButton);
-        container.add(deleteQuizButton);
+        container.add(takeQuizButton);
         container.add(resetNameButton);
         container.add(resetPassButton);
         container.add(logoutButton);
         container.add(delAccountButton);
-        container.add(submissionsButton);
     }
 
     public void addActionEvent() {
-        makeQuizButton.addActionListener(this);
-        editQuizButton.addActionListener(this);
-        deleteQuizButton.addActionListener(this);
+        takeQuizButton.addActionListener(this);
         resetNameButton.addActionListener(this);
         resetPassButton.addActionListener(this);
         logoutButton.addActionListener(this);
         delAccountButton.addActionListener(this);
-        submissionsButton.addActionListener(this);
     }
 
     @Override
@@ -103,30 +90,13 @@ public class CourseEditsOptionScreen extends JFrame implements ActionListener {
             } else if (e.getSource() == resetPassButton) {
                 ResetPasswordScreen currentScreen = new ResetPasswordScreen(socket, pw, oos, ois, this);
                 Utils.makeFrameFromTemplate(currentScreen, "Edit password");
-            } else if (e.getSource() == makeQuizButton) {
-                this.dispose();
-                CreateQuizScreen currentScreen = new CreateQuizScreen(socket, pw, oos, ois);
-                Utils.makeFrameFromTemplate(currentScreen, "Create Quiz");
-                //ChooseQuestionTypeScreen currentScreen = new ChooseQuestionTypeScreen(socket, pw, oos, ois, false);
-                //Utils.makeFrameFromTemplate(currentScreen, "Question types");
-            } else if (e.getSource() == deleteQuizButton) {
+            } else if (e.getSource() == takeQuizButton) {
                 oos.writeObject(Server.GET_QUIZZES_STR);
                 String x = (String) ois.readObject();
                 if (x.equals("Success")) {
                     ArrayList<String> quizzes = (ArrayList<String>) ois.readObject();
                     this.setVisible(false);
-                    QuizListScreen currentScreen = new QuizListScreen(socket, pw, oos, ois, quizzes, Server.DELETE_QUIZ, this);
-                    Utils.makeFrameFromTemplate(currentScreen, "Delete Quiz");
-                } else {
-                    JOptionPane.showMessageDialog(this,x);
-                }
-            } else if (e.getSource() == editQuizButton) {
-                oos.writeObject(Server.GET_QUIZZES_STR);
-                String x = (String) ois.readObject();
-                if (x.equals("Success")) {
-                    ArrayList<String> quizzes = (ArrayList<String>) ois.readObject();
-                    this.setVisible(false);
-                    QuizListScreen currentScreen = new QuizListScreen(socket, pw, oos, ois, quizzes, Server.EDIT_QUIZ, this);
+                    QuizListScreen currentScreen = new QuizListScreen(socket, pw, oos, ois, quizzes, Server.TAKE_QUIZ, this);
                     Utils.makeFrameFromTemplate(currentScreen, "Pick Quiz to Edit");
                 } else {
                     JOptionPane.showMessageDialog(this,x);
@@ -140,5 +110,3 @@ public class CourseEditsOptionScreen extends JFrame implements ActionListener {
     }
 
 }
-
-

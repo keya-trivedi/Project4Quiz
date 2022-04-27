@@ -34,6 +34,23 @@ public class QuizSubmission {
         quizEnd = new Date();
     }
 
+
+    public QuizSubmission(Quiz quiz, String username) {
+        this.quiz = quiz;
+        this.username = username;
+        this.quizStart = new Date();
+        this.questionsAsked = new ArrayList<>(quiz.getQuestions());
+        this.answeredQuestions = new ArrayList<>();
+
+        Collections.shuffle(questionsAsked);
+
+        int numCorrect = 0;
+
+
+        System.out.printf("You got a %d/%d on this quiz!\n", numCorrect, questionsAsked.size());
+
+        quizEnd = new Date();
+    }
     public String toString() {
         return String.format("%s done by %s: Finished on %s",quiz.getQuizName(), username, quizEnd);
     }

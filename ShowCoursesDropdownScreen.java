@@ -84,6 +84,15 @@ public class ShowCoursesDropdownScreen extends JFrame implements ActionListener 
                         oos.writeObject(jComboBox.getSelectedIndex());
                         CourseEditsOptionScreen currentScreen = new CourseEditsOptionScreen(socket, pw, oos, ois);
                         Utils.makeFrameFromTemplate(currentScreen, "Course edit options");
+                        break;
+                    case Server.ENTER_COURSE:
+                        this.dispose();
+                        oos.writeObject(Server.SET_CURRENT_COURSE);
+                        oos.writeObject(jComboBox.getSelectedIndex());
+                        StudentInCourseOptions currScreen = new StudentInCourseOptions(socket, pw, oos, ois);
+                        Utils.makeFrameFromTemplate(currScreen, "Course action options");
+                        break;
+
                 }
             }
         } catch (IOException ex) {
